@@ -8,19 +8,28 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ACSC.BL;
+using ACSC.BL.Repositories.Interface;
 
 namespace WindowsFormsACSC
 {
     public partial class FormAddress : Form
     {
+        private IAddressRepository<Address> _iAddressRepository;
+        private Address _address;
+        private Address _addressSelection;
+        private int customerId;
         public FormAddress(Customer customer)
         {
             InitializeComponent();
+            _iAddressRepository = new AddressRepository();
+            _address = _addressSelection = new Address { CustomerId = customer.Id };
+            customerId = customer.Id;
+            _fillListView(_iAddressRepository.GetBy(_address));
 
             this.Text = $"{customer.FullName} Address List";
             _getAddresses.CustomerId = customer.Id;
             _selectedAddress.CustomerId = customer.Id;
-            _initialFormState(_getAddresses, _dbAddress);
+            _initialFormState();
         }
         
         private Address _selectedAddress = new Address();
@@ -59,11 +68,8 @@ namespace WindowsFormsACSC
             }
             listViewAddress.Items.AddRange(listItem.ToArray());
         }
-        private void _initialFormState(Address address, AddressRepository db)
+        private void _initialFormState()
         {
-            var customers = db.GetBy(address);
-            _fillListView(customers);
-
             textBoxHouse.Text = string.Empty;
             textBoxProvince.Text = string.Empty;
             textBoxCity.Text = string.Empty;
@@ -93,7 +99,7 @@ namespace WindowsFormsACSC
             }
 
         }
-        private bool _search(Address address, AddressRepository db)
+        private bool _search(Address address)
         {
             if (string.IsNullOrWhiteSpace(address.AllInString) == true)
             {
@@ -101,7 +107,7 @@ namespace WindowsFormsACSC
                 return false;
             }
 
-            var addresses = db.GetBy(address);
+            var addresses = _iAddressRepository.GetBy(address);
 
             if (addresses.Count < 1)
             {
@@ -112,11 +118,11 @@ namespace WindowsFormsACSC
             return true;
 
         }
-        private bool _add(Address address, AddressRepository db)
+        private bool _add(Address address)
         {
             bool success = false;
 
-            if (db.Save(address) == true)
+            if (_iAddressRepository.Save(address) == true)
             {
                 MessageBox.Show("New record added.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 success = true;
@@ -129,7 +135,7 @@ namespace WindowsFormsACSC
             return success;
 
         }
-        private bool _update(Address selected, Address newValues, AddressRepository db)
+        private bool _update(Address selected, Address newValues)
         {
             bool success = false;
 
@@ -137,7 +143,7 @@ namespace WindowsFormsACSC
             {
                 MessageBox.Show("No changes is made, please check.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            else if (db.Save(newValues) == true)
+            else if (_iAddressRepository.Save(newValues) == true)
             {
                 MessageBox.Show("Record updated.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return true;
@@ -148,7 +154,7 @@ namespace WindowsFormsACSC
             }
             return success;
         }
-        private bool _delete(Address address, AddressRepository db)
+        private bool _delete(Address address)
         {
             bool success = false;
 
@@ -156,7 +162,7 @@ namespace WindowsFormsACSC
 
             if (dialogResult == DialogResult.Yes)
             {
-                if (db.Remove(address) == true)
+                if (_iAddressRepository.Remove(address) == true)
                 {
                     MessageBox.Show("Record removed.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     success = true;
@@ -194,9 +200,10 @@ namespace WindowsFormsACSC
                 CustomerId = _selectedAddress.CustomerId
             };
 
-            if (_search(address, _dbAddress) == true)
+            if (_search(address) == true)
             {
-                _initialFormState(address, _dbAddress);
+                _initialFormState();
+                _fillListView(_iAddressRepository.GetBy(address));
                 buttonReset.Enabled = true;
                 textBoxHouse.Text = address.HouseBuildingStreet;
                 textBoxProvince.Text = address.Province;
@@ -208,7 +215,8 @@ namespace WindowsFormsACSC
         {
             if (string.Equals(buttonAdd.Text, "Add"))
             {
-                _initialFormState(_getAddresses, _dbAddress);
+                _initialFormState();
+                _fillListView(_iAddressRepository.GetBy(_address));
                 buttonAdd.Text = "Save";
                 buttonSearch.Enabled = false;
                 buttonReset.Enabled = true;
@@ -224,9 +232,11 @@ namespace WindowsFormsACSC
                 CustomerId = _selectedAddress.CustomerId
             };
 
-            if (_add(address, _dbAddress) == true)
+            if (_add(address) == true)
             {
-                _initialFormState(_getAddresses, _dbAddress);
+                _initialFormState();
+                _fillListView(_iAddressRepository.GetBy(address));
+                buttonReset.Enabled = true;
             }
         }
         private void buttonUpdate_Click(object sender, EventArgs e)
@@ -255,21 +265,25 @@ namespace WindowsFormsACSC
                 CustomerId = _selectedAddress.CustomerId
             };
 
-            if (_update(_selectedAddress, address, _dbAddress) == true)
+            if (_update(_selectedAddress, address) == true)
             {
-                _initialFormState(_getAddresses, _dbAddress);
+                _initialFormState();
+                _fillListView(_iAddressRepository.GetBy(address));
+                buttonReset.Enabled = true;
             }
         }
         private void buttonDelete_Click(object sender, EventArgs e)
         {
-            if (_delete(_selectedAddress, _dbAddress) == true)
+            if (_delete(_selectedAddress) == true)
             {
-                _initialFormState(_getAddresses, _dbAddress);
+                _initialFormState();
+                _fillListView(_iAddressRepository.GetBy(_address));
             }
         }
         private void buttonReset_Click(object sender, EventArgs e)
         {
-            _initialFormState(_getAddresses, _dbAddress);
+            _initialFormState();
+            _fillListView(_iAddressRepository.GetBy(_address));
         }
         private void FormAddress_FormClosing(object sender, FormClosingEventArgs e)
         {

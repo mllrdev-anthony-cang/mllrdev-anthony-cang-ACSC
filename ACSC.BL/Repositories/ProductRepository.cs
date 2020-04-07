@@ -23,7 +23,7 @@ namespace ACSC.BL
             }
         }
 
-        private string SqlView(Product product)
+        public string SqlView(Product product)
         {
             string sql = $"SELECT TOP 1000 * FROM Product WHERE MarkAs = 'Active'";
             var validlist = ValidateSearchField(product);

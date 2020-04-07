@@ -13,8 +13,7 @@ namespace ACSC.BL
         public string Province { get; set; }
         public string CityMunicipality { get; set; }
         public string Barangay { get; set; }
-        public int CustomerId { get; set; }
-        
+        public int CustomerId { get; set; }        
         public bool Validate
         {
             get

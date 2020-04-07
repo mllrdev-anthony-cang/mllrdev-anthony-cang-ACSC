@@ -8,22 +8,23 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ACSC.BL;
+using ACSC.BL.Repositories.Interface;
 
 namespace WindowsFormsACSC
 {
     public partial class FormProduct : Form
     {
+        private IProductRepository<Product> _iProductRepository;
+        private Product _product;
+        private Product _productSelection;
         public FormProduct()
         {
             InitializeComponent();
-            _initialFormState(_getProducts, _dbProduct);
-        }
-        private Product _selectedProduct = new Product();
-        private Product _getProducts = new Product();
-        private ProductRepository _dbProduct = new ProductRepository();
-        private decimal _currentPrice;
-        private decimal _maxPrice;
-        private decimal _minPrice;
+            _iProductRepository = new ProductRepository();
+            _product = _productSelection = new Product();
+            _fillListView(_iProductRepository.GetBy(_product));
+            _initialFormState();
+        }        
         private void _fillListView(List<Product> products)
         {
             listViewProduct.Clear();
@@ -56,11 +57,8 @@ namespace WindowsFormsACSC
             }
             listViewProduct.Items.AddRange(listItem.ToArray());
         }
-        private void _initialFormState(Product product, ProductRepository db)
+        private void _initialFormState()
         {
-            var customers = db.GetBy(product);
-            _fillListView(customers);
-
             labelProduct.Text = string.Empty;
             textBoxName.Text = string.Empty;
             textBoxDescription.Text = string.Empty;
@@ -84,18 +82,7 @@ namespace WindowsFormsACSC
             buttonDelete.Enabled = false;
 
         }
-        private void _select(ListView.SelectedListViewItemCollection selectedrow, Product setSelected)
-        {
-            if (selectedrow.Count > 0)
-            {
-                setSelected.Id = Convert.ToInt32(selectedrow[0].SubItems[0].Text);
-                setSelected.Name = selectedrow[0].SubItems[1].Text;
-                setSelected.Description = selectedrow[0].SubItems[2].Text;
-                setSelected.CurrentPrice = Convert.ToDecimal(selectedrow[0].SubItems[3].Text);
-            }
-
-        }
-        private bool _search(Product product, ProductRepository db)
+        private bool _search(Product product)
         {
             if (string.IsNullOrWhiteSpace(product.AllInString) == true && product.MaxPrice == null && product.MinPrice == null)
             {
@@ -103,8 +90,8 @@ namespace WindowsFormsACSC
                 return false;
             }
 
-            var products = db.GetBy(product);
-        
+            var products = _iProductRepository.GetBy(product);
+            
             if (products.Count < 1)
             {
                 MessageBox.Show("No records found.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -114,11 +101,11 @@ namespace WindowsFormsACSC
             return true;
 
         }
-        private bool _add(Product product, ProductRepository db)
+        private bool _add(Product product)
         {
             bool success = false;
 
-            if (db.Save(product) == true)
+            if (_iProductRepository.Save(product) == true)
             {
                 MessageBox.Show("New record added.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 success = true;
@@ -131,15 +118,15 @@ namespace WindowsFormsACSC
             return success;
 
         }
-        private bool _update(Product selected, Product newValues, ProductRepository db)
+        private bool _update(Product oldPropVal, Product newPropVal)
         {
             bool success = false;
 
-            if (string.Equals(selected.AllInString, newValues.AllInString) == true)
+            if (string.Equals(oldPropVal.AllInString, newPropVal.AllInString) == true)
             {
                 MessageBox.Show("No changes is made, please check.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            else if (db.Save(newValues) == true)
+            else if (_iProductRepository.Save(newPropVal) == true)
             {
                 MessageBox.Show("Record updated.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return true;
@@ -150,7 +137,7 @@ namespace WindowsFormsACSC
             }
             return success;
         }
-        private bool _delete(Product product, ProductRepository db)
+        private bool _delete(Product product)
         {
             bool success = false;
 
@@ -158,7 +145,7 @@ namespace WindowsFormsACSC
 
             if (dialogResult == DialogResult.Yes)
             {
-                if (db.Remove(product) == true)
+                if (_iProductRepository.Remove(product) == true)
                 {
                     MessageBox.Show("Record removed.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     success = true;
@@ -173,8 +160,17 @@ namespace WindowsFormsACSC
         }        
         private void listViewProduct_SelectedIndexChanged(object sender, EventArgs e)
         {
-            _select(listViewProduct.SelectedItems, _selectedProduct);
-            labelProduct.Text = $"{_selectedProduct.Name}\r\n{_selectedProduct.Description}\r\n{_selectedProduct.CurrentPrice} Php";
+            var selectedrow = listViewProduct.SelectedItems;
+            _productSelection = new Product();
+
+            if (selectedrow.Count > 0)
+            {
+                _productSelection.Id = Convert.ToInt32(selectedrow[0].SubItems[0].Text);
+                _productSelection.Name = selectedrow[0].SubItems[1].Text;
+                _productSelection.Description = selectedrow[0].SubItems[2].Text;
+                _productSelection.CurrentPrice = Convert.ToDecimal(selectedrow[0].SubItems[3].Text);
+            }
+            labelProduct.Text = $"{_productSelection.Name}\r\n{_productSelection.Description}\r\n{_productSelection.CurrentPrice} Php";
             buttonDelete.Enabled = true;
             buttonAdd.Text = "Add";
             buttonReset.Enabled = true;
@@ -182,12 +178,13 @@ namespace WindowsFormsACSC
         }
         private void buttonSearch_Click(object sender, EventArgs e)
         {
+            decimal maxPrice, minPrice;
             var product = new Product
             {
                 Name = textBoxName.Text.Trim(),
                 Description = textBoxDescription.Text.Trim(),
-                MaxPrice = decimal.TryParse(textBoxMaxPrice.Text.Trim(), out _maxPrice) ? _maxPrice : _maxPrice,
-                MinPrice = decimal.TryParse(textBoxMinPrice.Text.Trim(), out _minPrice) ? _minPrice : _minPrice
+                MaxPrice = decimal.TryParse(textBoxMaxPrice.Text.Trim(), out maxPrice) ? maxPrice : maxPrice,
+                MinPrice = decimal.TryParse(textBoxMinPrice.Text.Trim(), out minPrice) ? minPrice : minPrice
             };
 
             if (product.MaxPrice == 0 && product.MinPrice == 0)
@@ -196,9 +193,10 @@ namespace WindowsFormsACSC
                 product.MinPrice = null;
             }            
 
-            if (_search(product, _dbProduct) == true)
+            if (_search(product) == true)
             {
-                _initialFormState(product, _dbProduct);
+                _initialFormState();
+                _fillListView(_iProductRepository.GetBy(product));
                 buttonReset.Enabled = true;
                 textBoxName.Text = product.Name;
                 textBoxDescription.Text = product.Description;
@@ -210,7 +208,7 @@ namespace WindowsFormsACSC
         {
             if (string.Equals(buttonAdd.Text, "Add"))
             {
-                _initialFormState(_getProducts, _dbProduct);
+                _initialFormState();
                 buttonAdd.Text = "Save";
                 buttonSearch.Enabled = false;
                 buttonReset.Enabled = true;
@@ -221,25 +219,28 @@ namespace WindowsFormsACSC
 
                 return;
             }
+            decimal currentPrice;
             var product = new Product
             {
                 Name = textBoxName.Text.Trim(),
                 Description = textBoxDescription.Text.Trim(),
-                CurrentPrice = decimal.TryParse(textBoxCurrentPrice.Text.Trim(), out _currentPrice) ? _currentPrice : _currentPrice
+                CurrentPrice = decimal.TryParse(textBoxCurrentPrice.Text.Trim(), out currentPrice) ? currentPrice : currentPrice
             };
 
-            if (_add(product, _dbProduct) == true)
+            if (_add(product) == true)
             {
-                _initialFormState(_getProducts, _dbProduct);
+                _initialFormState();
+                _fillListView(_iProductRepository.GetBy(product));
+                buttonReset.Enabled = true;
             }
         }
         private void buttonUpdate_Click(object sender, EventArgs e)
         {
             if (string.Equals("Edit", buttonUpdate.Text))
             {
-                textBoxName.Text = _selectedProduct.Name;
-                textBoxDescription.Text = _selectedProduct.Description;
-                textBoxCurrentPrice.Text = _selectedProduct.CurrentPrice.ToString();                
+                textBoxName.Text = _productSelection.Name;
+                textBoxDescription.Text = _productSelection.Description;
+                textBoxCurrentPrice.Text = _productSelection.CurrentPrice.ToString();                
 
                 buttonUpdate.Text = "Update";
                 buttonAdd.Enabled = false;
@@ -252,25 +253,28 @@ namespace WindowsFormsACSC
 
                 return;
             }
-
-            var product = new Product
+            decimal currentPrice;
+            var productNewProp = new Product
             {
-                Id = _selectedProduct.Id,
+                Id = _productSelection.Id,
                 Name = textBoxName.Text.Trim(),
                 Description = textBoxDescription.Text.Trim(),
-                CurrentPrice = decimal.TryParse(textBoxCurrentPrice.Text.Trim(), out _currentPrice) ? _currentPrice : _currentPrice
+                CurrentPrice = decimal.TryParse(textBoxCurrentPrice.Text.Trim(), out currentPrice) ? currentPrice : currentPrice
             };
 
-            if (_update(_selectedProduct, product, _dbProduct) == true)
+            if (_update(_productSelection, productNewProp) == true)
             {
-                _initialFormState(_getProducts, _dbProduct);
+                _initialFormState();
+                _fillListView(_iProductRepository.GetBy(productNewProp));
+                buttonReset.Enabled = true;
             }
         }
         private void buttonDelete_Click(object sender, EventArgs e)
         {
-            if (_delete(_selectedProduct, _dbProduct) == true)
+            if (_delete(_productSelection) == true)
             {
-                _initialFormState(_getProducts, _dbProduct);
+                _initialFormState();
+                _fillListView(_iProductRepository.GetBy(_product));
             }
         }
         private void buttonCancel_Click(object sender, EventArgs e)
@@ -279,7 +283,8 @@ namespace WindowsFormsACSC
         }
         private void buttonReset_Click(object sender, EventArgs e)
         {
-            _initialFormState(_getProducts, _dbProduct);
+            _initialFormState();
+            _fillListView(_iProductRepository.GetBy(_product));
         }
         private void FormProduct_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -328,5 +333,6 @@ namespace WindowsFormsACSC
                 e.Handled = true;
             }
         }
+
     }
 }
