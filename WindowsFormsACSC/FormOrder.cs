@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ACSC.BL;
+using ACSC.BL.Repositories.Interface;
 
 namespace WindowsFormsACSC
 {
@@ -25,22 +26,16 @@ namespace WindowsFormsACSC
 
         private List<OrderItem> _selectedProducts = new List<OrderItem>();
         private Product _selectedOrderItem = new Product();
-        private decimal _selectedOrderItemQuantity;
-        private decimal _productQuantity;
-        private decimal _totalAmount;
+        private decimal _selectedOrderItemQuantity,_productQuantity,_totalAmount;
         private bool _orderSaved = false;
 
-        private Product _selectedProduct = new Product();
-        private Product _getProducts = new Product();
-        private ProductRepository _dbProduct = new ProductRepository();
-        private decimal _maxPrice;
-        private decimal _minPrice;
-        private Customer _selectedCustomer = new Customer();
-        private Customer _getCustomers = new Customer();
-        private CustomerRepository _dbCustomer = new CustomerRepository();
-        private Address _selectedAddress = new Address();
-        private Address _getAddresses = new Address();
-        private AddressRepository _dbAddress = new AddressRepository();
+        private Product _selectedProduct = new Product(),_getProducts = new Product();
+        private IProductRepository<Product> _dbProduct = new ProductRepository();
+        private decimal _maxPrice,_minPrice;
+        private Customer _selectedCustomer = new Customer(), _getCustomers = new Customer();
+        private ICustomerRepository<Customer> _dbCustomer = new CustomerRepository();
+        private Address _selectedAddress = new Address(), _getAddresses = new Address();
+        private IAddressRepository<Address> _dbAddress = new AddressRepository();
 
         private void _fillListView(List<Product> products)
         {
@@ -74,7 +69,7 @@ namespace WindowsFormsACSC
             }
             listViewProduct.Items.AddRange(listItem.ToArray());
         }
-        private void _initialTabProductState(Product product, ProductRepository db)
+        private void _initialTabProductState(Product product, IProductRepository<Product> db)
         {
             var customers = db.GetBy(product);
             _fillListView(customers);
@@ -114,7 +109,7 @@ namespace WindowsFormsACSC
             textBoxOrderItemQuantity.Text = string.Empty;
             labelOrderItem.Text = string.Empty;
         }
-        private bool _search(Product product, ProductRepository db)
+        private bool _search(Product product, IProductRepository<Product> db)
         {
             if (string.IsNullOrWhiteSpace(product.AllInString) == true && product.MaxPrice == null && product.MinPrice == null)
             {
@@ -165,7 +160,7 @@ namespace WindowsFormsACSC
             }
             listViewCustomer.Items.AddRange(listItem.ToArray());
         }
-        private void _initialTabCustomerState(Customer customer, CustomerRepository db)
+        private void _initialTabCustomerState(Customer customer, ICustomerRepository<Customer> db)
         {
             var customers = db.GetBy(customer);
             _fillListView(customers);
@@ -181,7 +176,7 @@ namespace WindowsFormsACSC
             buttonCustomerBack.Enabled = true;
 
         }
-        private bool _search(Customer customer, CustomerRepository db)
+        private bool _search(Customer customer, ICustomerRepository<Customer> db)
         {
             if (string.IsNullOrWhiteSpace(customer.AllInString) == true)
             {
@@ -233,7 +228,7 @@ namespace WindowsFormsACSC
             }
             listViewAddress.Items.AddRange(listItem.ToArray());
         }
-        private void _initialTabAddressState(Address address, AddressRepository db)
+        private void _initialTabAddressState(Address address, IAddressRepository<Address> db)
         {
             var customers = db.GetBy(address);
             _fillListView(customers);
@@ -247,7 +242,7 @@ namespace WindowsFormsACSC
             buttonAddressSearch.Enabled = true;
             buttonAddressReset.Enabled = false;
         }
-        private bool _search(Address address, AddressRepository db)
+        private bool _search(Address address, IAddressRepository<Address> db)
         {
             if (string.IsNullOrWhiteSpace(address.AllInString) == true)
             {
@@ -717,7 +712,7 @@ namespace WindowsFormsACSC
                 MinOrderDate = orderDate.ToString("yyyy-MM-dd HH:mm:ss.fff"),
                 MaxOrderDate = orderDate.ToString("yyyy-MM-dd HH:mm:ss.fff")
             };
-            var orderDB = new OrderRepository();
+            IOrderRepository<Order> orderDB = new OrderRepository();
 
             if(orderDB.Save(order) == false)
             {
@@ -726,7 +721,7 @@ namespace WindowsFormsACSC
             }
             var retrieveSaveOrder = orderDB.GetLastId();
             var orderSummaryRows = listViewSummary.Items;
-            var orderItemDB = new OrderItemRepository();
+            IOrderItemRepository<OrderItem> orderItemDB = new OrderItemRepository();
             var saveCount = 0;
 
             for (var i = 0; i < orderSummaryRows.Count; i++)

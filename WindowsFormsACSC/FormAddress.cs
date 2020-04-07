@@ -15,26 +15,17 @@ namespace WindowsFormsACSC
     public partial class FormAddress : Form
     {
         private IAddressRepository<Address> _iAddressRepository;
-        private Address _address;
-        private Address _addressSelection;
-        private int customerId;
+        private Address _address,_addressSelection;
         public FormAddress(Customer customer)
         {
             InitializeComponent();
             _iAddressRepository = new AddressRepository();
             _address = _addressSelection = new Address { CustomerId = customer.Id };
-            customerId = customer.Id;
             _fillListView(_iAddressRepository.GetBy(_address));
-
             this.Text = $"{customer.FullName} Address List";
-            _getAddresses.CustomerId = customer.Id;
-            _selectedAddress.CustomerId = customer.Id;
             _initialFormState();
-        }
+        }       
         
-        private Address _selectedAddress = new Address();
-        private Address _getAddresses = new Address();
-        private AddressRepository _dbAddress = new AddressRepository();
         private void _fillListView(List<Address> addresses)
         {
             listViewAddress.Clear();
@@ -181,8 +172,18 @@ namespace WindowsFormsACSC
         }
         private void listViewAddress_SelectedIndexChanged(object sender, EventArgs e)
         {
-            _select(listViewAddress.SelectedItems, _selectedAddress);
-            labelAddress.Text = _selectedAddress.FullAddress;
+            var selectedrow = listViewAddress.SelectedItems;
+            _addressSelection = new Address { CustomerId = _address.CustomerId};
+
+            if (selectedrow.Count > 0)
+            {
+                _addressSelection.Id = Convert.ToInt32(selectedrow[0].SubItems[0].Text);
+                _addressSelection.HouseBuildingStreet = selectedrow[0].SubItems[1].Text;
+                _addressSelection.Province = selectedrow[0].SubItems[2].Text;
+                _addressSelection.CityMunicipality = selectedrow[0].SubItems[3].Text;
+                _addressSelection.Barangay = selectedrow[0].SubItems[4].Text;
+            }
+            labelAddress.Text = _addressSelection.FullAddress;
 
             buttonDelete.Enabled = true;
             buttonAdd.Text = "Add";
@@ -197,7 +198,7 @@ namespace WindowsFormsACSC
                 Province = textBoxProvince.Text.Trim(),
                 CityMunicipality = textBoxCity.Text.Trim(),
                 Barangay = textBoxBarangay.Text.Trim(),
-                CustomerId = _selectedAddress.CustomerId
+                CustomerId = _addressSelection.CustomerId
             };
 
             if (_search(address) == true)
@@ -216,7 +217,7 @@ namespace WindowsFormsACSC
             if (string.Equals(buttonAdd.Text, "Add"))
             {
                 _initialFormState();
-                _fillListView(_iAddressRepository.GetBy(_address));
+                //_fillListView(_iAddressRepository.GetBy(_address));
                 buttonAdd.Text = "Save";
                 buttonSearch.Enabled = false;
                 buttonReset.Enabled = true;
@@ -229,7 +230,7 @@ namespace WindowsFormsACSC
                 Province = textBoxProvince.Text.Trim(),
                 CityMunicipality = textBoxCity.Text.Trim(),
                 Barangay = textBoxBarangay.Text.Trim(),
-                CustomerId = _selectedAddress.CustomerId
+                CustomerId = _addressSelection.CustomerId
             };
 
             if (_add(address) == true)
@@ -243,10 +244,10 @@ namespace WindowsFormsACSC
         {
             if (string.Equals("Edit", buttonUpdate.Text))
             {
-                textBoxHouse.Text = _selectedAddress.HouseBuildingStreet;
-                textBoxProvince.Text = _selectedAddress.Province;
-                textBoxCity.Text = _selectedAddress.CityMunicipality;
-                textBoxBarangay.Text = _selectedAddress.Barangay;
+                textBoxHouse.Text = _addressSelection.HouseBuildingStreet;
+                textBoxProvince.Text = _addressSelection.Province;
+                textBoxCity.Text = _addressSelection.CityMunicipality;
+                textBoxBarangay.Text = _addressSelection.Barangay;
 
                 buttonUpdate.Text = "Update";
                 buttonAdd.Enabled = false;
@@ -257,15 +258,15 @@ namespace WindowsFormsACSC
 
             var address = new Address
             {
-                Id = _selectedAddress.Id,
+                Id = _addressSelection.Id,
                 HouseBuildingStreet = textBoxHouse.Text.Trim(),
                 Province = textBoxProvince.Text.Trim(),
                 CityMunicipality = textBoxCity.Text.Trim(),
                 Barangay = textBoxBarangay.Text.Trim(),
-                CustomerId = _selectedAddress.CustomerId
+                CustomerId = _addressSelection.CustomerId
             };
 
-            if (_update(_selectedAddress, address) == true)
+            if (_update(_addressSelection, address) == true)
             {
                 _initialFormState();
                 _fillListView(_iAddressRepository.GetBy(address));
@@ -274,7 +275,7 @@ namespace WindowsFormsACSC
         }
         private void buttonDelete_Click(object sender, EventArgs e)
         {
-            if (_delete(_selectedAddress) == true)
+            if (_delete(_addressSelection) == true)
             {
                 _initialFormState();
                 _fillListView(_iAddressRepository.GetBy(_address));

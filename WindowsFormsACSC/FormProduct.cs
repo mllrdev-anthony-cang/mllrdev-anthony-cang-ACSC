@@ -15,8 +15,7 @@ namespace WindowsFormsACSC
     public partial class FormProduct : Form
     {
         private IProductRepository<Product> _iProductRepository;
-        private Product _product;
-        private Product _productSelection;
+        private Product _product, _productSelection;
         public FormProduct()
         {
             InitializeComponent();

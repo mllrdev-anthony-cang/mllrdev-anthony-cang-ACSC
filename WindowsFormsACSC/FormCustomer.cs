@@ -8,19 +8,23 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ACSC.BL;
+using ACSC.BL.Repositories.Interface;
 
 namespace WindowsFormsACSC
 {
     public partial class FormCustomer : Form
     {
+        private ICustomerRepository<Customer> _iCustomerRepository;
+        private Customer _customerSelection, _customer;
         public FormCustomer()
         {
             InitializeComponent();
-            _initialFormState(_getCustomers, _dbCustomer);
+            _customer = _customerSelection = new Customer();
+            _iCustomerRepository = new CustomerRepository();
+            _initialFormState();
+            _fillListView(_iCustomerRepository.GetBy(_customer));
         }
-        private Customer _selectedCustomer = new Customer();
-        private Customer _getCustomers = new Customer();
-        private CustomerRepository _dbCustomer = new CustomerRepository();
+        
         private void _fillListView(List<Customer> customers)
         {
             listViewCustomer.Clear();
@@ -53,11 +57,8 @@ namespace WindowsFormsACSC
             }
             listViewCustomer.Items.AddRange(listItem.ToArray());
         }
-        private void _initialFormState(Customer customer,CustomerRepository db)
+        private void _initialFormState()
         {
-            var customers = db.GetBy(customer);
-            _fillListView(customers);
-
             labelCustomer.Text = string.Empty;
             textBoxFirstName.Text = string.Empty;
             textBoxLastName.Text = string.Empty;
@@ -76,18 +77,8 @@ namespace WindowsFormsACSC
             buttonAddress.Enabled = false;
             
         }        
-        private void _select(ListView.SelectedListViewItemCollection selectedrow, Customer setSelected)
-        {
-            if(selectedrow.Count > 0)
-            {
-                setSelected.Id = Convert.ToInt32(selectedrow[0].SubItems[0].Text);
-                setSelected.FirstName = selectedrow[0].SubItems[1].Text;
-                setSelected.LastName = selectedrow[0].SubItems[2].Text;
-                setSelected.PhoneNumber = selectedrow[0].SubItems[3].Text;
-            }
-                        
-        }
-        private bool _search(Customer customer, CustomerRepository db)
+       
+        private bool _search(Customer customer)
         {
             if (string.IsNullOrWhiteSpace(customer.AllInString) == true)
             {
@@ -95,7 +86,7 @@ namespace WindowsFormsACSC
                 return false;
             }
 
-            var customers = db.GetBy(customer);
+            var customers = _iCustomerRepository.GetBy(customer);
 
             if (customers.Count < 1)
             {
@@ -106,11 +97,11 @@ namespace WindowsFormsACSC
             return true;
 
         }
-        private bool _add(Customer customer, CustomerRepository db)
+        private bool _add(Customer customer)
         {
             bool success = false;
 
-            if (db.Save(customer) == true)
+            if (_iCustomerRepository.Save(customer) == true)
             {
                 MessageBox.Show("New record added.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 success = true;
@@ -123,7 +114,7 @@ namespace WindowsFormsACSC
             return success;
 
         }
-        private bool _update(Customer selected, Customer newValues, CustomerRepository db)
+        private bool _update(Customer selected, Customer newValues)
         {
             bool success = false;
 
@@ -131,7 +122,7 @@ namespace WindowsFormsACSC
             {
                 MessageBox.Show("No changes is made, please check.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            else if (db.Save(newValues) == true)
+            else if (_iCustomerRepository.Save(newValues) == true)
             {
                 MessageBox.Show("Record updated.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return true;
@@ -142,7 +133,7 @@ namespace WindowsFormsACSC
             }
             return success;
         }
-        private bool _delete(Customer customer, CustomerRepository db)
+        private bool _delete(Customer customer)
         {
             bool success = false;
 
@@ -150,7 +141,7 @@ namespace WindowsFormsACSC
 
             if (dialogResult == DialogResult.Yes)
             {
-                if (db.Remove(customer) == true)
+                if (_iCustomerRepository.Remove(customer) == true)
                 {
                     MessageBox.Show("Record removed.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     success = true;
@@ -165,8 +156,17 @@ namespace WindowsFormsACSC
         }
         private void listViewCustomer_SelectedIndexChanged(object sender, EventArgs e)
         {
-            _select(listViewCustomer.SelectedItems, _selectedCustomer);
-            labelCustomer.Text = $"Name: {_selectedCustomer.FullName}\r\n\r\nPhone number:{_selectedCustomer.PhoneNumber}";
+            var selectedrow = listViewCustomer.SelectedItems;
+            _customerSelection = new Customer();
+
+            if (selectedrow.Count > 0)
+            {
+                _customerSelection.Id = Convert.ToInt32(selectedrow[0].SubItems[0].Text);
+                _customerSelection.FirstName = selectedrow[0].SubItems[1].Text;
+                _customerSelection.LastName = selectedrow[0].SubItems[2].Text;
+                _customerSelection.PhoneNumber = selectedrow[0].SubItems[3].Text;
+            }
+            labelCustomer.Text = $"Name: {_customerSelection.FullName}\r\n\r\nPhone number:{_customerSelection.PhoneNumber}";
             buttonDelete.Enabled = true;
             buttonAddress.Enabled = true;
             buttonAdd.Text = "Add";
@@ -177,7 +177,7 @@ namespace WindowsFormsACSC
         {
             if (string.Equals(buttonAdd.Text, "Add"))
             {
-                _initialFormState(_getCustomers, _dbCustomer);
+                _initialFormState();
                 buttonAdd.Text = "Save";
                 buttonSearch.Enabled = false;
                 buttonReset.Enabled = true;
@@ -191,9 +191,11 @@ namespace WindowsFormsACSC
                 PhoneNumber = textBoxPhoneNumber.Text.Trim()
             };
 
-            if(_add(customer, _dbCustomer) == true)
+            if(_add(customer) == true)
             {
-                _initialFormState(_getCustomers, _dbCustomer);
+                _initialFormState();
+                _fillListView(_iCustomerRepository.GetBy(customer));
+                buttonReset.Enabled = true;
             }
 
         }        
@@ -201,9 +203,9 @@ namespace WindowsFormsACSC
         {  
             if(string.Equals("Edit", buttonUpdate.Text))
             {
-                textBoxFirstName.Text = _selectedCustomer.FirstName;
-                textBoxLastName.Text = _selectedCustomer.LastName;
-                textBoxPhoneNumber.Text = _selectedCustomer.PhoneNumber;
+                textBoxFirstName.Text = _customerSelection.FirstName;
+                textBoxLastName.Text = _customerSelection.LastName;
+                textBoxPhoneNumber.Text = _customerSelection.PhoneNumber;
 
                 buttonUpdate.Text = "Update";
                 buttonAdd.Enabled = false;
@@ -215,23 +217,26 @@ namespace WindowsFormsACSC
 
             var customer = new Customer
             {
-                Id = _selectedCustomer.Id,
+                Id = _customerSelection.Id,
                 FirstName = textBoxFirstName.Text.Trim(),
                 LastName = textBoxLastName.Text.Trim(),
                 PhoneNumber = textBoxPhoneNumber.Text.Trim()
             };
 
-            if (_update(_selectedCustomer, customer, _dbCustomer) == true)
+            if (_update(_customerSelection, customer) == true)
             {
-                _initialFormState(_getCustomers, _dbCustomer);
+                _initialFormState();
+                _fillListView(_iCustomerRepository.GetBy(customer));
+                buttonReset.Enabled = true;
             }
             
         }        
         private void buttonDelete_Click(object sender, EventArgs e)
         {
-            if(_delete(_selectedCustomer, _dbCustomer) == true)
+            if(_delete(_customerSelection) == true)
             {
-                _initialFormState(_getCustomers, _dbCustomer);
+                _initialFormState();
+                _fillListView(_iCustomerRepository.GetBy(_customer));
             }
         }
         private void buttonCancel_Click(object sender, EventArgs e)
@@ -241,7 +246,7 @@ namespace WindowsFormsACSC
         }
         private void buttonAddress_Click(object sender, EventArgs e)
         {
-            var newForm = new FormAddress(_selectedCustomer);            
+            var newForm = new FormAddress(_customerSelection);            
             newForm.ShowDialog();
         }        
         private void buttonSearch_Click(object sender, EventArgs e)
@@ -253,9 +258,10 @@ namespace WindowsFormsACSC
                 PhoneNumber = textBoxPhoneNumber.Text.Trim()
             };
 
-            if(_search(customer, _dbCustomer) == true)
+            if(_search(customer) == true)
             {
-                _initialFormState(customer, _dbCustomer);
+                _initialFormState();
+                _fillListView(_iCustomerRepository.GetBy(customer));
                 buttonReset.Enabled = true;
                 textBoxFirstName.Text = customer.FirstName;
                 textBoxLastName.Text = customer.LastName;
@@ -265,7 +271,8 @@ namespace WindowsFormsACSC
         }
         private void buttonReset_Click(object sender, EventArgs e)
         {
-            _initialFormState(_getCustomers, _dbCustomer);
+            _initialFormState();
+            _fillListView(_iCustomerRepository.GetBy(_customer));
         }
 
         private void FormCustomer_FormClosing(object sender, FormClosingEventArgs e)

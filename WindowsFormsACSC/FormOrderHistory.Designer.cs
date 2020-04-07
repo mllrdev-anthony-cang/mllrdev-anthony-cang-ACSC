@@ -75,7 +75,7 @@
             this.dateTimePickerMinDate.Name = "dateTimePickerMinDate";
             this.dateTimePickerMinDate.Size = new System.Drawing.Size(109, 20);
             this.dateTimePickerMinDate.TabIndex = 19;
-            this.dateTimePickerMinDate.Value = new System.DateTime(2020, 4, 6, 0, 0, 0, 0);
+            this.dateTimePickerMinDate.Value = new System.DateTime(2020, 4, 7, 14, 33, 10, 0);
             // 
             // label3
             // 
