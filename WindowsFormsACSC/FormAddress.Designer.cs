@@ -67,6 +67,7 @@
             // textBoxHouse
             // 
             this.textBoxHouse.Location = new System.Drawing.Point(6, 36);
+            this.textBoxHouse.MaxLength = 250;
             this.textBoxHouse.Name = "textBoxHouse";
             this.textBoxHouse.Size = new System.Drawing.Size(227, 20);
             this.textBoxHouse.TabIndex = 1;
@@ -138,6 +139,7 @@
             // textBoxProvince
             // 
             this.textBoxProvince.Location = new System.Drawing.Point(6, 75);
+            this.textBoxProvince.MaxLength = 250;
             this.textBoxProvince.Name = "textBoxProvince";
             this.textBoxProvince.Size = new System.Drawing.Size(227, 20);
             this.textBoxProvince.TabIndex = 1;
@@ -154,6 +156,7 @@
             // textBoxCity
             // 
             this.textBoxCity.Location = new System.Drawing.Point(6, 114);
+            this.textBoxCity.MaxLength = 250;
             this.textBoxCity.Name = "textBoxCity";
             this.textBoxCity.Size = new System.Drawing.Size(227, 20);
             this.textBoxCity.TabIndex = 1;
@@ -170,6 +173,7 @@
             // textBoxBarangay
             // 
             this.textBoxBarangay.Location = new System.Drawing.Point(6, 153);
+            this.textBoxBarangay.MaxLength = 250;
             this.textBoxBarangay.Name = "textBoxBarangay";
             this.textBoxBarangay.Size = new System.Drawing.Size(227, 20);
             this.textBoxBarangay.TabIndex = 1;
