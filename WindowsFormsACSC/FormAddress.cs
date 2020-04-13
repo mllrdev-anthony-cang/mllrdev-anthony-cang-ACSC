@@ -201,7 +201,11 @@ namespace WindowsFormsACSC
                 CustomerId = _addressSelection.CustomerId
             };
 
-            if (_search(address) == true)
+            if (string.IsNullOrWhiteSpace(_iAddressRepository.SearchOperation(address)) == false)
+            {
+                MessageBox.Show(_iAddressRepository.SearchOperation(address), "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
             {
                 _initialFormState();
                 _fillListView(_iAddressRepository.GetBy(address));
@@ -217,7 +221,6 @@ namespace WindowsFormsACSC
             if (string.Equals(buttonAdd.Text, "Add"))
             {
                 _initialFormState();
-                //_fillListView(_iAddressRepository.GetBy(_address));
                 buttonAdd.Text = "Save";
                 buttonSearch.Enabled = false;
                 buttonReset.Enabled = true;
@@ -232,12 +235,18 @@ namespace WindowsFormsACSC
                 Barangay = textBoxBarangay.Text.Trim(),
                 CustomerId = _addressSelection.CustomerId
             };
+            var addMessage = _iAddressRepository.AddOperation(address);
 
-            if (_add(address) == true)
+            if (string.Equals(addMessage, "New record added."))
             {
                 _initialFormState();
                 _fillListView(_iAddressRepository.GetBy(address));
                 buttonReset.Enabled = true;
+                MessageBox.Show(addMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show(addMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void buttonUpdate_Click(object sender, EventArgs e)
@@ -265,20 +274,38 @@ namespace WindowsFormsACSC
                 Barangay = textBoxBarangay.Text.Trim(),
                 CustomerId = _addressSelection.CustomerId
             };
+            var updateMessage = _iAddressRepository.UpdateOperation(_addressSelection, address);
 
-            if (_update(_addressSelection, address) == true)
+            if (string.Equals(updateMessage, "Record updated."))
             {
                 _initialFormState();
                 _fillListView(_iAddressRepository.GetBy(address));
                 buttonReset.Enabled = true;
+                MessageBox.Show(updateMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show(updateMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void buttonDelete_Click(object sender, EventArgs e)
         {
-            if (_delete(_addressSelection) == true)
+            DialogResult dialogResult = MessageBox.Show("Are you sure you want to delete this record?", "Message Box", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
+
+            if (dialogResult == DialogResult.Yes)
             {
-                _initialFormState();
-                _fillListView(_iAddressRepository.GetBy(_address));
+                var deleteMessage = _iAddressRepository.DeleteOperation(_addressSelection);
+
+                if (string.Equals(deleteMessage, "Record removed."))
+                {
+                    _initialFormState();
+                    _fillListView(_iAddressRepository.GetBy(_address));
+                    MessageBox.Show(deleteMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show(deleteMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
         private void buttonReset_Click(object sender, EventArgs e)

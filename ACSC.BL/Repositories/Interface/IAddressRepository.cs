@@ -11,5 +11,9 @@ namespace ACSC.BL.Repositories.Interface
         List<T> GetBy(T obj);
         bool Save(T obj);
         bool Remove(T obj);
+        string SearchOperation(T obj);
+        string AddOperation(T obj);
+        string UpdateOperation(T obj1, T obj2);
+        string DeleteOperation(T obj);
     }
 }

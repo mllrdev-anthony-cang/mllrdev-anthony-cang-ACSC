@@ -53,7 +53,6 @@ namespace ACSC.BL
             }
             return sql;
         }
-
         private List<string> ValidateSearchField(Address address)
         {
                 var list = new List<string>();
@@ -66,7 +65,6 @@ namespace ACSC.BL
 
                 return list;
         }
-
         public bool Save(Address address)
         {
             bool success = false;
@@ -108,7 +106,6 @@ namespace ACSC.BL
             }
             return success;
         }
-
         public bool Remove(Address address)
         {
             bool success = false;
@@ -127,6 +124,71 @@ namespace ACSC.BL
             success = true;
 
             return success;
+        }
+        public string SearchOperation(Address address)
+        {
+            string message = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(address.AllInString) == true)
+            {
+                return message = "Please enter a value before searching.";
+            }
+
+            var customers = GetBy(address);
+
+            if (customers.Count < 1)
+            {
+                message = "No records found.";
+            }
+            return message;
+        }
+        public string AddOperation(Address address)
+        {
+            string message = string.Empty;
+
+            if (Save(address) == true)
+            {
+                message = "New record added.";
+            }
+            else
+            {
+                message = "Please don't leave the text boxes empty.";
+            }
+
+            return message;
+
+        }
+        public string UpdateOperation(Address oldPropVal, Address newPropVal)
+        {
+            string message = string.Empty;
+
+            if (string.Equals(oldPropVal.AllInString, newPropVal.AllInString) == true)
+            {
+                message = "No changes is made, please check.";
+            }
+            else if (Save(newPropVal) == true)
+            {
+                message = "Record updated.";
+            }
+            else
+            {
+                message = "Please don't leave the text boxes empty.";
+            }
+            return message;
+        }
+        public string DeleteOperation(Address address)
+        {
+            string message = string.Empty;
+
+            if (Remove(address) == true)
+            {
+                message = "Record removed.";
+            }
+            else
+            {
+                message = "Failed! No record passed.";
+            }
+            return message;
         }
 
     }

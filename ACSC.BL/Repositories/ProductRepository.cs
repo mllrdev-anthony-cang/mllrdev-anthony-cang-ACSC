@@ -122,5 +122,71 @@ namespace ACSC.BL
 
             return success;
         }
+
+        public string SearchOperation(Product product)
+        {
+            string message = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(product.AllInString) == true && product.MaxPrice == null && product.MinPrice == null)
+            {
+                return message = "Please enter a value before searching.";                
+            }
+
+            var products = GetBy(product);
+
+            if (products.Count < 1)
+            {
+                message = "No records found.";
+            }
+            return message;            
+        }
+        public string AddOperation(Product product)
+        {
+            string message = string.Empty;
+                       
+            if (Save(product) == true)
+            {
+                message = "New record added.";
+            }
+            else
+            {
+                message = "Please don't leave the text boxes empty.";
+            }
+
+            return message;
+
+        }
+        public string UpdateOperation(Product oldPropVal, Product newPropVal)
+        {
+            string message = string.Empty;
+
+            if (string.Equals(oldPropVal.AllInString, newPropVal.AllInString) == true)
+            {
+                message = "No changes is made, please check.";
+            }
+            else if (Save(newPropVal) == true)
+            {
+                message = "Record updated.";
+            }
+            else
+            {
+                message = "Please don't leave the text boxes empty.";
+            }
+            return message;
+        }
+        public string DeleteOperation(Product product)
+        {
+            string message = string.Empty;
+            
+            if (Remove(product) == true)
+            {
+                message = "Record removed.";
+            }
+            else
+            {
+                message = "Failed! No record passed.";
+            }
+            return message;
+        }
     }
 }

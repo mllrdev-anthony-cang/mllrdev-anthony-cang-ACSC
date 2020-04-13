@@ -115,5 +115,71 @@ namespace ACSC.BL
 
             return success;
         }
+
+        public string SearchOperation(Customer customer)
+        {
+            string message = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(customer.AllInString) == true)
+            {
+                return message = "Please enter a value before searching.";
+            }
+
+            var customers = GetBy(customer);
+
+            if (customers.Count < 1)
+            {
+                message = "No records found.";
+            }
+            return message;
+        }
+        public string AddOperation(Customer customer)
+        {
+            string message = string.Empty;
+
+            if (Save(customer) == true)
+            {
+                message = "New record added.";
+            }
+            else
+            {
+                message = "Please don't leave the text boxes empty.";
+            }
+
+            return message;
+
+        }
+        public string UpdateOperation(Customer oldPropVal, Customer newPropVal)
+        {
+            string message = string.Empty;
+
+            if (string.Equals(oldPropVal.AllInString, newPropVal.AllInString) == true)
+            {
+                message = "No changes is made, please check.";
+            }
+            else if (Save(newPropVal) == true)
+            {
+                message = "Record updated.";
+            }
+            else
+            {
+                message = "Please don't leave the text boxes empty.";
+            }
+            return message;
+        }
+        public string DeleteOperation(Customer customer)
+        {
+            string message = string.Empty;
+
+            if (Remove(customer) == true)
+            {
+                message = "Record removed.";
+            }
+            else
+            {
+                message = "Failed! No record passed.";
+            }
+            return message;
+        }
     }
 }

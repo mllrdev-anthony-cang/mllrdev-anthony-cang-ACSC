@@ -69,7 +69,7 @@ namespace WindowsFormsACSC
                 $"\r\n\r\nAddress: {_order.ShippingAddress}";
 
             labelOrderSummary.Text = $"Subtotal ({numberOfitems} items): {Math.Round(Convert.ToDouble(_order.TotalAmount), 2).ToString("0.00")}" +
-                $"\r\n\r\nTotal: {Math.Round(Convert.ToDouble(_order.TotalAmount), 2).ToString("0.00")}";
+                $"\r\n\r\nTotal: {Math.Round(Convert.ToDouble(_order.TotalAmount), 2).ToString("0,000.00")}";
         }
 
         private void buttonSummaryBack_Click(object sender, EventArgs e)

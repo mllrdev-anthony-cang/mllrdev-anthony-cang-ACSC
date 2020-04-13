@@ -115,7 +115,7 @@
             this.textBoxMaxPrice.Name = "textBoxMaxPrice";
             this.textBoxMaxPrice.Size = new System.Drawing.Size(109, 20);
             this.textBoxMaxPrice.TabIndex = 3;
-            this.textBoxMaxPrice.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxMaxPrice_KeyPress);
+            this.textBoxMaxPrice.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxCurrentPrice_KeyPress);
             // 
             // textBoxMinPrice
             // 
@@ -123,7 +123,7 @@
             this.textBoxMinPrice.Name = "textBoxMinPrice";
             this.textBoxMinPrice.Size = new System.Drawing.Size(109, 20);
             this.textBoxMinPrice.TabIndex = 3;
-            this.textBoxMinPrice.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxMinPrice_KeyPress);
+            this.textBoxMinPrice.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxCurrentPrice_KeyPress);
             // 
             // textBoxCurrentPrice
             // 

@@ -23,8 +23,7 @@ namespace WindowsFormsACSC
             _iCustomerRepository = new CustomerRepository();
             _initialFormState();
             _fillListView(_iCustomerRepository.GetBy(_customer));
-        }
-        
+        }        
         private void _fillListView(List<Customer> customers)
         {
             listViewCustomer.Clear();
@@ -76,84 +75,7 @@ namespace WindowsFormsACSC
             buttonDelete.Enabled = false;
             buttonAddress.Enabled = false;
             
-        }        
-       
-        private bool _search(Customer customer)
-        {
-            if (string.IsNullOrWhiteSpace(customer.AllInString) == true)
-            {
-                MessageBox.Show("Please enter a value before searching.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-
-            var customers = _iCustomerRepository.GetBy(customer);
-
-            if (customers.Count < 1)
-            {
-                MessageBox.Show("No records found.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            _fillListView(customers);
-            return true;
-
-        }
-        private bool _add(Customer customer)
-        {
-            bool success = false;
-
-            if (_iCustomerRepository.Save(customer) == true)
-            {
-                MessageBox.Show("New record added.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                success = true;
-            }
-            else
-            {
-                MessageBox.Show("Please don't leave the text boxes empty.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            return success;
-
-        }
-        private bool _update(Customer selected, Customer newValues)
-        {
-            bool success = false;
-
-            if (string.Equals(selected.AllInString, newValues.AllInString) == true)
-            {
-                MessageBox.Show("No changes is made, please check.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            else if (_iCustomerRepository.Save(newValues) == true)
-            {
-                MessageBox.Show("Record updated.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return true;
-            }
-            else
-            {
-                MessageBox.Show("Please don't leave the text boxes empty.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            return success;
-        }
-        private bool _delete(Customer customer)
-        {
-            bool success = false;
-
-            DialogResult dialogResult = MessageBox.Show("Are you sure you want to delete this record?", "Message Box", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
-
-            if (dialogResult == DialogResult.Yes)
-            {
-                if (_iCustomerRepository.Remove(customer) == true)
-                {
-                    MessageBox.Show("Record removed.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    success = true;
-                }
-                else
-                {
-                    MessageBox.Show($"Failed! No reocrod id passed.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-
-            return success;
-        }
+        }                      
         private void listViewCustomer_SelectedIndexChanged(object sender, EventArgs e)
         {
             var selectedrow = listViewCustomer.SelectedItems;
@@ -181,7 +103,6 @@ namespace WindowsFormsACSC
                 buttonAdd.Text = "Save";
                 buttonSearch.Enabled = false;
                 buttonReset.Enabled = true;
-
                 return;
             }
             var customer = new Customer
@@ -191,11 +112,18 @@ namespace WindowsFormsACSC
                 PhoneNumber = textBoxPhoneNumber.Text.Trim()
             };
 
-            if(_add(customer) == true)
+            var addMessage = _iCustomerRepository.AddOperation(customer);
+
+            if (string.Equals(addMessage, "New record added."))
             {
                 _initialFormState();
                 _fillListView(_iCustomerRepository.GetBy(customer));
                 buttonReset.Enabled = true;
+                MessageBox.Show(addMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show(addMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
         }        
@@ -223,20 +151,38 @@ namespace WindowsFormsACSC
                 PhoneNumber = textBoxPhoneNumber.Text.Trim()
             };
 
-            if (_update(_customerSelection, customer) == true)
+            var updateMessage = _iCustomerRepository.UpdateOperation(_customerSelection, customer);
+
+            if (string.Equals(updateMessage, "Record updated."))
             {
                 _initialFormState();
                 _fillListView(_iCustomerRepository.GetBy(customer));
                 buttonReset.Enabled = true;
+                MessageBox.Show(updateMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            
+            else
+            {
+                MessageBox.Show(updateMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }        
         private void buttonDelete_Click(object sender, EventArgs e)
         {
-            if(_delete(_customerSelection) == true)
+            DialogResult dialogResult = MessageBox.Show("Are you sure you want to delete this record?", "Message Box", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
+
+            if (dialogResult == DialogResult.Yes)
             {
-                _initialFormState();
-                _fillListView(_iCustomerRepository.GetBy(_customer));
+                var deleteMessage = _iCustomerRepository.DeleteOperation(_customerSelection);
+
+                if (string.Equals(deleteMessage, "Record removed."))
+                {
+                    _initialFormState();
+                    _fillListView(_iCustomerRepository.GetBy(_customer));
+                    MessageBox.Show(deleteMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show(deleteMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
         private void buttonCancel_Click(object sender, EventArgs e)
@@ -256,9 +202,13 @@ namespace WindowsFormsACSC
                 FirstName = textBoxFirstName.Text.Trim(),
                 LastName = textBoxLastName.Text.Trim(),
                 PhoneNumber = textBoxPhoneNumber.Text.Trim()
-            };
+            };           
 
-            if(_search(customer) == true)
+            if (string.IsNullOrWhiteSpace(_iCustomerRepository.SearchOperation(customer)) == false)
+            {
+                MessageBox.Show(_iCustomerRepository.SearchOperation(customer), "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
             {
                 _initialFormState();
                 _fillListView(_iCustomerRepository.GetBy(customer));
@@ -267,14 +217,13 @@ namespace WindowsFormsACSC
                 textBoxLastName.Text = customer.LastName;
                 textBoxPhoneNumber.Text = customer.PhoneNumber;
             }
-            
+
         }
         private void buttonReset_Click(object sender, EventArgs e)
         {
             _initialFormState();
             _fillListView(_iCustomerRepository.GetBy(_customer));
         }
-
         private void FormCustomer_FormClosing(object sender, FormClosingEventArgs e)
         {
             DialogResult dialogResult = MessageBox.Show($"Are you sure you want to cancel {this.Text} window?", "Message Box", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);

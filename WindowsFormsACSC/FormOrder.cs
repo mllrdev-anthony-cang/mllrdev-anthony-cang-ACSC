@@ -69,6 +69,107 @@ namespace WindowsFormsACSC
             }
             listViewProduct.Items.AddRange(listItem.ToArray());
         }
+        private void _fillListView(List<Customer> customers)
+        {
+            listViewCustomer.Clear();
+            // Set the view to show details.
+            listViewCustomer.View = View.Details;
+            // Select the item and subitems when selection is made.
+            listViewCustomer.FullRowSelect = true;
+            // Display grid lines.
+            listViewCustomer.GridLines = true;
+            // Sort the items in the list in ascending order.
+            listViewCustomer.Sorting = SortOrder.Ascending;
+
+            // Create columns for the items and subitems.
+            // Width of -2 indicates auto-size.
+            listViewCustomer.Columns.Add("Id", 0, HorizontalAlignment.Center);
+            listViewCustomer.Columns.Add("First Name", 150, HorizontalAlignment.Center);
+            listViewCustomer.Columns.Add("Last Name", 150, HorizontalAlignment.Center);
+            listViewCustomer.Columns.Add("Phone Number", 120, HorizontalAlignment.Center);
+
+            var listItem = new List<ListViewItem>();
+
+            foreach (var customer in customers)
+            {
+                ListViewItem item = new ListViewItem(customer.Id.ToString());
+                item.SubItems.Add(customer.FirstName);
+                item.SubItems.Add(customer.LastName);
+                item.SubItems.Add(customer.PhoneNumber);
+
+                listItem.Add(item);
+            }
+            listViewCustomer.Items.AddRange(listItem.ToArray());
+        }
+        private void _fillListView(List<Address> addresses)
+        {
+            listViewAddress.Clear();
+            // Set the view to show details.
+            listViewAddress.View = View.Details;
+            // Select the item and subitems when selection is made.
+            listViewAddress.FullRowSelect = true;
+            // Display grid lines.
+            listViewAddress.GridLines = true;
+            // Sort the items in the list in ascending order.
+            listViewAddress.Sorting = SortOrder.Ascending;
+
+            // Create columns for the items and subitems.
+            // Width of -2 indicates auto-size.
+            listViewAddress.Columns.Add("Id", 0, HorizontalAlignment.Center);
+            listViewAddress.Columns.Add("House, Building, Street", 200, HorizontalAlignment.Center);
+            listViewAddress.Columns.Add("Province", 120, HorizontalAlignment.Center);
+            listViewAddress.Columns.Add("City \\ Municipality", 120, HorizontalAlignment.Center);
+            listViewAddress.Columns.Add("Barangay", 120, HorizontalAlignment.Center);
+            var listItem = new List<ListViewItem>();
+
+            foreach (var address in addresses)
+            {
+                ListViewItem item = new ListViewItem(address.Id.ToString());
+                item.SubItems.Add(address.HouseBuildingStreet);
+                item.SubItems.Add(address.Province);
+                item.SubItems.Add(address.CityMunicipality);
+                item.SubItems.Add(address.Barangay);
+
+                listItem.Add(item);
+            }
+            listViewAddress.Items.AddRange(listItem.ToArray());
+        }
+        private void _fillListView(Address filter)
+        {
+            listViewAddress.Clear();
+            // Set the view to show details.
+            listViewAddress.View = View.Details;
+            // Select the item and subitems when selection is made.
+            listViewAddress.FullRowSelect = true;
+            // Display grid lines.
+            listViewAddress.GridLines = true;
+            // Sort the items in the list in ascending order.
+            listViewAddress.Sorting = SortOrder.Ascending;
+
+            // Create columns for the items and subitems.
+            // Width of -2 indicates auto-size.
+            listViewAddress.Columns.Add("Id", 0, HorizontalAlignment.Center);
+            listViewAddress.Columns.Add("House, Building, Street", 200, HorizontalAlignment.Center);
+            listViewAddress.Columns.Add("Province", 120, HorizontalAlignment.Center);
+            listViewAddress.Columns.Add("City \\ Municipality", 120, HorizontalAlignment.Center);
+            listViewAddress.Columns.Add("Barangay", 120, HorizontalAlignment.Center);
+
+            AddressRepository db = new AddressRepository();
+            var addressList = new List<ListViewItem>();
+            var addresses = db.GetBy(filter);
+
+            foreach (var address in addresses)
+            {
+                ListViewItem item = new ListViewItem(address.Id.ToString());
+                item.SubItems.Add(address.HouseBuildingStreet);
+                item.SubItems.Add(address.Province);
+                item.SubItems.Add(address.CityMunicipality);
+                item.SubItems.Add(address.Barangay);
+
+                addressList.Add(item);
+            }
+            listViewAddress.Items.AddRange(addressList.ToArray());
+        }
         private void _initialTabProductState(Product product, IProductRepository<Product> db)
         {
             var customers = db.GetBy(product);
@@ -109,6 +210,56 @@ namespace WindowsFormsACSC
             textBoxOrderItemQuantity.Text = string.Empty;
             labelOrderItem.Text = string.Empty;
         }
+        private void _initialTabCustomerState(Customer customer, ICustomerRepository<Customer> db)
+        {
+            var customers = db.GetBy(customer);
+            _fillListView(customers);
+
+            labelCustomer.Text = string.Empty;
+            textBoxCustomerFirstName.Text = string.Empty;
+            textBoxCustomerLastName.Text = string.Empty;
+            textBoxCustomerPhoneNumber.Text = string.Empty;
+
+            buttonCustomerSearch.Enabled = true;
+            buttonCustomerReset.Enabled = false;
+            buttonCustomerNext.Enabled = true;
+            buttonCustomerBack.Enabled = true;
+
+        }
+        private void _initialTabAddressState(Address address, IAddressRepository<Address> db)
+        {
+            var customers = db.GetBy(address);
+            _fillListView(customers);
+
+            textBoxAddressHouse.Text = string.Empty;
+            textBoxAddressProvince.Text = string.Empty;
+            textBoxAddressCity.Text = string.Empty;
+            textBoxAddressBarangay.Text = string.Empty;
+            labelAddress.Text = string.Empty;
+
+            buttonAddressSearch.Enabled = true;
+            buttonAddressReset.Enabled = false;
+        }
+        private void _initializeListViewOrderItem()
+        {
+            listViewOrderItem.Clear();
+            // Set the view to show details.
+            listViewOrderItem.View = View.Details;
+            // Select the item and subitems when selection is made.
+            listViewOrderItem.FullRowSelect = true;
+            // Display grid lines.
+            listViewOrderItem.GridLines = true;
+            // Sort the items in the list in ascending order.
+            listViewOrderItem.Sorting = SortOrder.Ascending;
+
+            // Create columns for the items and subitems.
+            // Width of -2 indicates auto-size.
+            listViewOrderItem.Columns.Add("Id", 0, HorizontalAlignment.Center);
+            listViewOrderItem.Columns.Add("Name", 150, HorizontalAlignment.Center);
+            listViewOrderItem.Columns.Add("Description", 150, HorizontalAlignment.Center);
+            listViewOrderItem.Columns.Add("Purchase Price", 120, HorizontalAlignment.Center);
+            listViewOrderItem.Columns.Add("Quantity", 120, HorizontalAlignment.Center);
+        }
         private bool _search(Product product, IProductRepository<Product> db)
         {
             if (string.IsNullOrWhiteSpace(product.AllInString) == true && product.MaxPrice == null && product.MinPrice == null)
@@ -127,55 +278,7 @@ namespace WindowsFormsACSC
             _fillListView(products);
             return true;
 
-        }
-        private void _fillListView(List<Customer> customers)
-        {
-            listViewCustomer.Clear();
-            // Set the view to show details.
-            listViewCustomer.View = View.Details;
-            // Select the item and subitems when selection is made.
-            listViewCustomer.FullRowSelect = true;
-            // Display grid lines.
-            listViewCustomer.GridLines = true;
-            // Sort the items in the list in ascending order.
-            listViewCustomer.Sorting = SortOrder.Ascending;
-
-            // Create columns for the items and subitems.
-            // Width of -2 indicates auto-size.
-            listViewCustomer.Columns.Add("Id", 0, HorizontalAlignment.Center);
-            listViewCustomer.Columns.Add("First Name", 150, HorizontalAlignment.Center);
-            listViewCustomer.Columns.Add("Last Name", 150, HorizontalAlignment.Center);
-            listViewCustomer.Columns.Add("Phone Number", 120, HorizontalAlignment.Center);
-
-            var listItem = new List<ListViewItem>();
-
-            foreach (var customer in customers)
-            {
-                ListViewItem item = new ListViewItem(customer.Id.ToString());
-                item.SubItems.Add(customer.FirstName);
-                item.SubItems.Add(customer.LastName);
-                item.SubItems.Add(customer.PhoneNumber);
-
-                listItem.Add(item);
-            }
-            listViewCustomer.Items.AddRange(listItem.ToArray());
-        }
-        private void _initialTabCustomerState(Customer customer, ICustomerRepository<Customer> db)
-        {
-            var customers = db.GetBy(customer);
-            _fillListView(customers);
-
-            labelCustomer.Text = string.Empty;
-            textBoxCustomerFirstName.Text = string.Empty;
-            textBoxCustomerLastName.Text = string.Empty;
-            textBoxCustomerPhoneNumber.Text = string.Empty;
-
-            buttonCustomerSearch.Enabled = true;
-            buttonCustomerReset.Enabled = false;
-            buttonCustomerNext.Enabled = true;
-            buttonCustomerBack.Enabled = true;
-
-        }
+        }                
         private bool _search(Customer customer, ICustomerRepository<Customer> db)
         {
             if (string.IsNullOrWhiteSpace(customer.AllInString) == true)
@@ -194,54 +297,7 @@ namespace WindowsFormsACSC
             _fillListView(customers);
             return true;
 
-        }
-        private void _fillListView(List<Address> addresses)
-        {
-            listViewAddress.Clear();
-            // Set the view to show details.
-            listViewAddress.View = View.Details;
-            // Select the item and subitems when selection is made.
-            listViewAddress.FullRowSelect = true;
-            // Display grid lines.
-            listViewAddress.GridLines = true;
-            // Sort the items in the list in ascending order.
-            listViewAddress.Sorting = SortOrder.Ascending;
-
-            // Create columns for the items and subitems.
-            // Width of -2 indicates auto-size.
-            listViewAddress.Columns.Add("Id", 0, HorizontalAlignment.Center);
-            listViewAddress.Columns.Add("House, Building, Street", 200, HorizontalAlignment.Center);
-            listViewAddress.Columns.Add("Province", 120, HorizontalAlignment.Center);
-            listViewAddress.Columns.Add("City \\ Municipality", 120, HorizontalAlignment.Center);
-            listViewAddress.Columns.Add("Barangay", 120, HorizontalAlignment.Center);
-            var listItem = new List<ListViewItem>();
-
-            foreach (var address in addresses)
-            {
-                ListViewItem item = new ListViewItem(address.Id.ToString());
-                item.SubItems.Add(address.HouseBuildingStreet);
-                item.SubItems.Add(address.Province);
-                item.SubItems.Add(address.CityMunicipality);
-                item.SubItems.Add(address.Barangay);
-
-                listItem.Add(item);
-            }
-            listViewAddress.Items.AddRange(listItem.ToArray());
-        }
-        private void _initialTabAddressState(Address address, IAddressRepository<Address> db)
-        {
-            var customers = db.GetBy(address);
-            _fillListView(customers);
-
-            textBoxAddressHouse.Text = string.Empty;
-            textBoxAddressProvince.Text = string.Empty;
-            textBoxAddressCity.Text = string.Empty;
-            textBoxAddressBarangay.Text = string.Empty;
-            labelAddress.Text = string.Empty;
-
-            buttonAddressSearch.Enabled = true;
-            buttonAddressReset.Enabled = false;
-        }
+        }                
         private bool _search(Address address, IAddressRepository<Address> db)
         {
             if (string.IsNullOrWhiteSpace(address.AllInString) == true)
@@ -260,7 +316,59 @@ namespace WindowsFormsACSC
             _fillListView(addresses);
             return true;
 
-        }       
+        }
+        private void _addressClearAll()
+        {
+            buttonAddressNext.Enabled = false;
+
+            textBoxAddressHouse.Text = string.Empty;
+            textBoxAddressProvince.Text = string.Empty;
+            textBoxAddressCity.Text = string.Empty;
+            textBoxAddressBarangay.Text = string.Empty;
+
+            var address = new Address { CustomerId = _selectedCustomer.Id };
+            _fillListView(address);
+            _selectedAddress = new Address();
+        }
+        private void _generateSummary()
+        {
+            listViewSummary.Clear();
+            // Set the view to show details.
+            listViewSummary.View = View.Details;
+            // Select the item and subitems when selection is made.
+            listViewSummary.FullRowSelect = true;
+            // Display grid lines.
+            listViewSummary.GridLines = true;
+            // Sort the items in the list in ascending order.
+            listViewSummary.Sorting = SortOrder.Ascending;
+
+            // Create columns for the items and subitems.
+            // Width of -2 indicates auto-size.
+            listViewSummary.Columns.Add("Id", 0, HorizontalAlignment.Center);
+            listViewSummary.Columns.Add("Name", 150, HorizontalAlignment.Center);
+            listViewSummary.Columns.Add("Description", 150, HorizontalAlignment.Center);
+            listViewSummary.Columns.Add("Purchase Price", 120, HorizontalAlignment.Center);
+            listViewSummary.Columns.Add("Quantity", 120, HorizontalAlignment.Center);
+
+            var orderitemsrows = listViewOrderItem.Items;
+            decimal total = 0;
+            decimal? numberOfitems = 0;
+
+            for (var i = 0; i < orderitemsrows.Count; i++)
+            {
+                var item = listViewOrderItem.Items[i].Clone() as ListViewItem;
+                listViewSummary.Items.Add(item);
+
+                total += Convert.ToDecimal(orderitemsrows[i].SubItems[3].Text) * Convert.ToDecimal(orderitemsrows[i].SubItems[4].Text);
+                numberOfitems += Convert.ToDecimal(orderitemsrows[i].SubItems[4].Text);
+            }
+            _totalAmount = total;
+            labelBillAndShip.Text = $"Customer: {_selectedCustomer.FullName}\r\n\r\nPhone Number:{_selectedCustomer.PhoneNumber}" +
+                $"\r\n\r\nAddress: {_selectedAddress.HouseBuildingStreet}, {_selectedAddress.Barangay}, {_selectedAddress.CityMunicipality}, {_selectedAddress.Province}";
+
+            labelOrderSummary.Text = $"Subtotal ({numberOfitems} items): {Math.Round(Convert.ToDouble(_totalAmount), 2).ToString("0.00")}" +
+                $"\r\n\r\nTotal: {Math.Round(Convert.ToDouble(_totalAmount), 2).ToString("0,000.00")}";
+        }
         private void buttonAdd_Click(object sender, EventArgs e)
         {
             if (string.Equals("Add to cart", buttonProductAdd.Text))
@@ -385,27 +493,7 @@ namespace WindowsFormsACSC
                 textBoxProductMaxPrice.Text = product.MaxPrice.ToString();
                 textBoxProductMinPrice.Text = product.MinPrice.ToString();
             }
-        }       
-        private void _initializeListViewOrderItem()
-        {
-            listViewOrderItem.Clear();
-            // Set the view to show details.
-            listViewOrderItem.View = View.Details;
-            // Select the item and subitems when selection is made.
-            listViewOrderItem.FullRowSelect = true;
-            // Display grid lines.
-            listViewOrderItem.GridLines = true;
-            // Sort the items in the list in ascending order.
-            listViewOrderItem.Sorting = SortOrder.Ascending;
-
-            // Create columns for the items and subitems.
-            // Width of -2 indicates auto-size.
-            listViewOrderItem.Columns.Add("Id", 0, HorizontalAlignment.Center);
-            listViewOrderItem.Columns.Add("Name", 150, HorizontalAlignment.Center);
-            listViewOrderItem.Columns.Add("Description", 150, HorizontalAlignment.Center);
-            listViewOrderItem.Columns.Add("Purchase Price", 120, HorizontalAlignment.Center);
-            listViewOrderItem.Columns.Add("Quantity", 120, HorizontalAlignment.Center);
-        }
+        }               
         private void buttonProductCancel_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -414,7 +502,7 @@ namespace WindowsFormsACSC
         {
             if(_selectedProducts.Count() > 0)
             {
-                tabControlOrder.SelectedTab = tabPageOrderItems;
+                tabControlOrder.SelectedTab = tabPageOrderItems;                
             }            
         }
         private void listViewOrderItem_SelectedIndexChanged(object sender, EventArgs e)
@@ -549,43 +637,7 @@ namespace WindowsFormsACSC
         private void buttonCustomerBack_Click(object sender, EventArgs e)
         {
             tabControlOrder.SelectedTab = tabPageOrderItems;
-        }
-        private void _fillListView(Address filter)
-        {
-            listViewAddress.Clear();
-            // Set the view to show details.
-            listViewAddress.View = View.Details;
-            // Select the item and subitems when selection is made.
-            listViewAddress.FullRowSelect = true;
-            // Display grid lines.
-            listViewAddress.GridLines = true;
-            // Sort the items in the list in ascending order.
-            listViewAddress.Sorting = SortOrder.Ascending;
-
-            // Create columns for the items and subitems.
-            // Width of -2 indicates auto-size.
-            listViewAddress.Columns.Add("Id", 0, HorizontalAlignment.Center);
-            listViewAddress.Columns.Add("House, Building, Street", 200, HorizontalAlignment.Center);
-            listViewAddress.Columns.Add("Province", 120, HorizontalAlignment.Center);
-            listViewAddress.Columns.Add("City \\ Municipality", 120, HorizontalAlignment.Center);
-            listViewAddress.Columns.Add("Barangay", 120, HorizontalAlignment.Center);
-
-            AddressRepository db = new AddressRepository();
-            var addressList = new List<ListViewItem>();
-            var addresses = db.GetBy(filter);
-
-            foreach (var address in addresses)
-            {
-                ListViewItem item = new ListViewItem(address.Id.ToString());
-                item.SubItems.Add(address.HouseBuildingStreet);
-                item.SubItems.Add(address.Province);
-                item.SubItems.Add(address.CityMunicipality);
-                item.SubItems.Add(address.Barangay);
-
-                addressList.Add(item);
-            }
-            listViewAddress.Items.AddRange(addressList.ToArray());
-        }
+        }        
         private void listViewAddress_SelectedIndexChanged(object sender, EventArgs e)
         {
             var selectedrow = listViewAddress.SelectedItems;
@@ -628,20 +680,7 @@ namespace WindowsFormsACSC
                 textBoxAddressCity.Text = address.CityMunicipality;
                 textBoxAddressBarangay.Text = address.Barangay;
             }
-        }
-        private void _addressClearAll()
-        {
-            buttonAddressNext.Enabled = false;
-
-            textBoxAddressHouse.Text = string.Empty;
-            textBoxAddressProvince.Text = string.Empty;
-            textBoxAddressCity.Text = string.Empty;
-            textBoxAddressBarangay.Text = string.Empty;
-
-            var address = new Address { CustomerId = _selectedCustomer.Id };
-            _fillListView(address);
-            _selectedAddress = new Address();
-        }      
+        }        
         private void buttonAddressNext_Click(object sender, EventArgs e)
         {
             var selectedrow = listViewAddress.SelectedItems;
@@ -656,46 +695,7 @@ namespace WindowsFormsACSC
         private void buttonAddressBack_Click(object sender, EventArgs e)
         {
             tabControlOrder.SelectedTab = tabPageCustomer;
-        }
-        private void _generateSummary()
-        {
-            listViewSummary.Clear();
-            // Set the view to show details.
-            listViewSummary.View = View.Details;
-            // Select the item and subitems when selection is made.
-            listViewSummary.FullRowSelect = true;
-            // Display grid lines.
-            listViewSummary.GridLines = true;
-            // Sort the items in the list in ascending order.
-            listViewSummary.Sorting = SortOrder.Ascending;
-
-            // Create columns for the items and subitems.
-            // Width of -2 indicates auto-size.
-            listViewSummary.Columns.Add("Id", 0, HorizontalAlignment.Center);
-            listViewSummary.Columns.Add("Name", 150, HorizontalAlignment.Center);
-            listViewSummary.Columns.Add("Description", 150, HorizontalAlignment.Center);
-            listViewSummary.Columns.Add("Purchase Price", 120, HorizontalAlignment.Center);
-            listViewSummary.Columns.Add("Quantity", 120, HorizontalAlignment.Center);            
-
-            var orderitemsrows = listViewOrderItem.Items;
-            decimal total = 0;
-            decimal? numberOfitems = 0;
-
-            for (var i = 0; i < orderitemsrows.Count; i++)
-            {
-                var item = listViewOrderItem.Items[i].Clone() as ListViewItem;
-                listViewSummary.Items.Add(item);
-
-                total += Convert.ToDecimal(orderitemsrows[i].SubItems[3].Text) * Convert.ToDecimal(orderitemsrows[i].SubItems[4].Text);
-                numberOfitems += Convert.ToDecimal(orderitemsrows[i].SubItems[4].Text);
-            }
-            _totalAmount = total;
-            labelBillAndShip.Text = $"Customer: {_selectedCustomer.FullName}\r\n\r\nPhone Number:{_selectedCustomer.PhoneNumber}" +
-                $"\r\n\r\nAddress: {_selectedAddress.HouseBuildingStreet}, {_selectedAddress.Barangay}, {_selectedAddress.CityMunicipality}, {_selectedAddress.Province}";
-
-            labelOrderSummary.Text = $"Subtotal ({numberOfitems} items): {Math.Round(Convert.ToDouble(_totalAmount), 2).ToString("0.00")}" +
-                $"\r\n\r\nTotal: {Math.Round(Convert.ToDouble(_totalAmount), 2).ToString("0.00")}";
-        }
+        }        
         private void tabPageSummary_Enter(object sender, EventArgs e)
         {
             _generateSummary();

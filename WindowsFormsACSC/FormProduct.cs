@@ -81,82 +81,6 @@ namespace WindowsFormsACSC
             buttonDelete.Enabled = false;
 
         }
-        private bool _search(Product product)
-        {
-            if (string.IsNullOrWhiteSpace(product.AllInString) == true && product.MaxPrice == null && product.MinPrice == null)
-            {
-                MessageBox.Show("Please enter a value before searching.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-
-            var products = _iProductRepository.GetBy(product);
-            
-            if (products.Count < 1)
-            {
-                MessageBox.Show("No records found.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            _fillListView(products);
-            return true;
-
-        }
-        private bool _add(Product product)
-        {
-            bool success = false;
-
-            if (_iProductRepository.Save(product) == true)
-            {
-                MessageBox.Show("New record added.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                success = true;
-            }
-            else
-            {
-                MessageBox.Show("Please don't leave the text boxes empty.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        
-            return success;
-
-        }
-        private bool _update(Product oldPropVal, Product newPropVal)
-        {
-            bool success = false;
-
-            if (string.Equals(oldPropVal.AllInString, newPropVal.AllInString) == true)
-            {
-                MessageBox.Show("No changes is made, please check.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            else if (_iProductRepository.Save(newPropVal) == true)
-            {
-                MessageBox.Show("Record updated.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return true;
-            }
-            else
-            {
-                MessageBox.Show("Please don't leave the text boxes empty.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            return success;
-        }
-        private bool _delete(Product product)
-        {
-            bool success = false;
-
-            DialogResult dialogResult = MessageBox.Show("Are you sure you want to delete this record?", "Message Box", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
-
-            if (dialogResult == DialogResult.Yes)
-            {
-                if (_iProductRepository.Remove(product) == true)
-                {
-                    MessageBox.Show("Record removed.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    success = true;
-                }
-                else
-                {
-                    MessageBox.Show($"Failed! No reocrod id passed.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-
-            return success;
-        }        
         private void listViewProduct_SelectedIndexChanged(object sender, EventArgs e)
         {
             var selectedrow = listViewProduct.SelectedItems;
@@ -190,9 +114,13 @@ namespace WindowsFormsACSC
             {
                 product.MaxPrice = null;
                 product.MinPrice = null;
-            }            
+            }
 
-            if (_search(product) == true)
+            if(string.IsNullOrWhiteSpace(_iProductRepository.SearchOperation(product)) == false)
+            {
+                MessageBox.Show(_iProductRepository.SearchOperation(product), "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
             {
                 _initialFormState();
                 _fillListView(_iProductRepository.GetBy(product));
@@ -226,12 +154,20 @@ namespace WindowsFormsACSC
                 CurrentPrice = decimal.TryParse(textBoxCurrentPrice.Text.Trim(), out currentPrice) ? currentPrice : currentPrice
             };
 
-            if (_add(product) == true)
+            var addMessage = _iProductRepository.AddOperation(product);
+
+            if (string.Equals(addMessage, "New record added."))
             {
                 _initialFormState();
                 _fillListView(_iProductRepository.GetBy(product));
                 buttonReset.Enabled = true;
+                MessageBox.Show(addMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+            else
+            {
+                MessageBox.Show(addMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
         }
         private void buttonUpdate_Click(object sender, EventArgs e)
         {
@@ -261,19 +197,38 @@ namespace WindowsFormsACSC
                 CurrentPrice = decimal.TryParse(textBoxCurrentPrice.Text.Trim(), out currentPrice) ? currentPrice : currentPrice
             };
 
-            if (_update(_productSelection, productNewProp) == true)
+            var updateMessage = _iProductRepository.UpdateOperation(_productSelection, productNewProp);
+
+            if (string.Equals(updateMessage,"Record updated."))
             {
                 _initialFormState();
                 _fillListView(_iProductRepository.GetBy(productNewProp));
                 buttonReset.Enabled = true;
+                MessageBox.Show(updateMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show(updateMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void buttonDelete_Click(object sender, EventArgs e)
         {
-            if (_delete(_productSelection) == true)
+            DialogResult dialogResult = MessageBox.Show("Are you sure you want to delete this record?", "Message Box", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
+
+            if (dialogResult == DialogResult.Yes)
             {
-                _initialFormState();
-                _fillListView(_iProductRepository.GetBy(_product));
+                var deleteMessage = _iProductRepository.DeleteOperation(_productSelection);
+
+                if (string.Equals(deleteMessage, "Record removed."))
+                {
+                    _initialFormState();
+                    _fillListView(_iProductRepository.GetBy(_product));
+                    MessageBox.Show(deleteMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show(deleteMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
         private void buttonCancel_Click(object sender, EventArgs e)
@@ -304,34 +259,5 @@ namespace WindowsFormsACSC
                 e.Handled = true;
             }
         }
-        private void textBoxMinPrice_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            // Verify that the pressed key isn't CTRL or any non-numeric digit
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
-            {
-                e.Handled = true;
-            }
-
-            // If you want, you can allow decimal (float) numbers
-            if ((e.KeyChar == '.') && ((sender as TextBox).Text.IndexOf('.') > -1))
-            {
-                e.Handled = true;
-            }
-        }
-        private void textBoxMaxPrice_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            // Verify that the pressed key isn't CTRL or any non-numeric digit
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
-            {
-                e.Handled = true;
-            }
-
-            // If you want, you can allow decimal (float) numbers
-            if ((e.KeyChar == '.') && ((sender as TextBox).Text.IndexOf('.') > -1))
-            {
-                e.Handled = true;
-            }
-        }
-
     }
 }
