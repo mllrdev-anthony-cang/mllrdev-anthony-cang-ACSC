@@ -5,22 +5,21 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ACSC.BL.Repositories;
 using ACSC.BL.Repositories.Interface;
 using Dapper;
 
 namespace ACSC.BL
 {
-    public class OrderItemRepository: IOrderItemRepository<OrderItem>
+    internal class OrderItemRepository: BaseRepository<OrderItem> ,IOrderItemRepository
     {
-        DBConnection dbStr = new DBConnection();
+        internal override string TableName => "[OrderItem]";
 
         public List<OrderItem> GetBy(OrderItem orderitem)
         {
-            using (IDbConnection db = new SqlConnection(dbStr.ToString()))
-            {
-                var result = db.Query<OrderItem>(SqlView(orderitem)).ToList();
-                return result;
-            }
+            var result = _connection.Query<OrderItem>(SqlView(orderitem)).ToList();
+            return result;
+            
         }
 
         private string SqlView(OrderItem orderitem)
@@ -84,17 +83,15 @@ namespace ACSC.BL
                         "WHERE OrderId = @OrderId AND ProductId = @ProductId";
                 }
 
-                using (IDbConnection db = new SqlConnection(dbStr.ToString()))
+                var result = _connection.Execute(sql, new
                 {
-                    var result = db.Execute(sql, new
-                    {
-                        OrderId = orderitem.OrderId,
-                        ProductId = orderitem.ProductId,
-                        PurchasePrice = orderitem.PurchasePrice,
-                        Quantity = orderitem.Quantity,
-                        MarkAs = "Active"
-                    });
-                }
+                    OrderId = orderitem.OrderId,
+                    ProductId = orderitem.ProductId,
+                    PurchasePrice = orderitem.PurchasePrice,
+                    Quantity = orderitem.Quantity,
+                    MarkAs = "Active"
+                });
+                
                 success = true;
             }
             return success;
@@ -107,15 +104,13 @@ namespace ACSC.BL
 
             if (orderitem.OrderId < 1 || orderitem.ProductId < 1) return success;
 
-            using (IDbConnection db = new SqlConnection(dbStr.ToString()))
-            {
-                var result = db.Execute(sql, new
-                {
-                    OrderId = orderitem.OrderId,
-                    ProductId = orderitem.ProductId,
-                    MarkAs = "Removed"
-                });
-            }
+            var result = _connection.Execute(sql, new
+             {
+                 OrderId = orderitem.OrderId,
+                 ProductId = orderitem.ProductId,
+                 MarkAs = "Removed"
+             });
+            
             success = true;
 
             return success;

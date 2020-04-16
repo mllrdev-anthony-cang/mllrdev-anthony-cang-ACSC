@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACSC.BL.Repositories.Interface
+namespace ACSC.BL.Manager.Interface
 {
-    public interface IAddressRepository: IRepository<Address>
+    public interface IAddressManager : IManager<Address>
     {
         List<Address> GetBy(Address obj);
         bool Save(Address obj);

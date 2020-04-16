@@ -5,22 +5,20 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ACSC.BL.Repositories;
 using ACSC.BL.Repositories.Interface;
 using Dapper;
 
 namespace ACSC.BL
 {
-    public class AddressRepository:IAddressRepository<Address>
+    internal class AddressRepository: BaseRepository<Address>, IAddressRepository
     {
-        DBConnection dbStr = new DBConnection();
+        internal override string TableName => "Address";
 
         public List<Address> GetBy(Address address)
         {
-            using (IDbConnection db = new SqlConnection(dbStr.ToString()))
-            {
-                var result = db.Query<Address>(SqlView(address)).ToList();
-                return result;
-            }
+             var result = _connection.Query<Address>(SqlView(address)).ToList();
+             return result;            
         }
         private string SqlView(Address address)
         {
@@ -89,19 +87,17 @@ namespace ACSC.BL
                         "WHERE Id = @Id AND CustomerId = @CustomerId";
                 }
 
-                using (IDbConnection db = new SqlConnection(dbStr.ToString()))
+                var result = _connection.Execute(sql, new
                 {
-                    var result = db.Execute(sql, new
-                    {
-                        Id = address.Id,
-                        HouseBuildingStreet = address.HouseBuildingStreet,
-                        Province = address.Province,
-                        CityMunicipality = address.CityMunicipality,
-                        Barangay = address.Barangay,
-                        CustomerId = address.CustomerId,
-                        MarkAs = "Active"
-                    });
-                }
+                    Id = address.Id,
+                    HouseBuildingStreet = address.HouseBuildingStreet,
+                    Province = address.Province,
+                    CityMunicipality = address.CityMunicipality,
+                    Barangay = address.Barangay,
+                    CustomerId = address.CustomerId,
+                    MarkAs = "Active"
+                });
+                
                 success = true;
             }
             return success;
@@ -113,14 +109,12 @@ namespace ACSC.BL
 
             if (address.Id < 1) return success;
 
-            using (IDbConnection db = new SqlConnection(dbStr.ToString()))
+            var result = _connection.Execute(sql, new
             {
-                var result = db.Execute(sql, new
-                {
-                    Id = address.Id,
-                    MarkAs = "Removed"
-                });
-            }
+                Id = address.Id,
+                MarkAs = "Removed"
+            });
+            
             success = true;
 
             return success;

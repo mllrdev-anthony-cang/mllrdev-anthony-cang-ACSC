@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACSC.BL.Repositories.Interface
+namespace ACSC.BL.Manager.Interface
 {
-    public interface IOrderItemRepository: IRepository<OrderItem>
+    public interface IOrderItemManager : IManager<OrderItem>
     {
         List<OrderItem> GetBy(OrderItem obj);
         bool Save(OrderItem obj);

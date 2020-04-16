@@ -8,18 +8,20 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ACSC.BL;
+using ACSC.BL.Manager;
+using ACSC.BL.Manager.Interface;
 using ACSC.BL.Repositories.Interface;
 
 namespace WindowsFormsACSC
 {
     public partial class FormProduct : Form
     {
-        private IProductRepository<Product> _iProductRepository;
+        private IProductManager _iProductRepository;
         private Product _product, _productSelection;
         public FormProduct()
         {
             InitializeComponent();
-            _iProductRepository = new ProductRepository();
+            _iProductRepository = new ProductManager();
             _product = _productSelection = new Product();
             _fillListView(_iProductRepository.GetBy(_product));
             _initialFormState();

@@ -5,22 +5,21 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ACSC.BL.Repositories;
 using ACSC.BL.Repositories.Interface;
 using Dapper;
 
 namespace ACSC.BL
 {
-    public class ProductRepository: IProductRepository<Product>
+    internal class ProductRepository: BaseRepository<Product>, IProductRepository
     {
-        DBConnection dbStr = new DBConnection();
-
+        internal override string TableName => "Product";
+        
         public List<Product> GetBy(Product product)
-        {
-            using (IDbConnection db = new SqlConnection(dbStr.ToString()))
-            {
-                var result = db.Query<Product>(SqlView(product)).ToList();
-                return result;
-            }
+        {            
+            var result = _connection.Query<Product>(SqlView(product)).ToList();
+            return result;
+            
         }
 
         public string SqlView(Product product)
@@ -54,14 +53,14 @@ namespace ACSC.BL
 
         private List<string> ValidateSearchField(Product product)
         {
-                var list = new List<string>();
+            var list = new List<string>();
 
-                if (product.Id > 0) list.Add("Id");
-                if (string.IsNullOrWhiteSpace(product.Name) == false) list.Add(nameof(product.Name));
-                if (string.IsNullOrWhiteSpace(product.Description) == false) list.Add(nameof(product.Description));
-                if ((product.MinPrice != null) && (product.MaxPrice != null)) list.Add($"{nameof(product.MinPrice)}{nameof(product.MaxPrice)}");
+            if (product.Id > 0) list.Add("Id");
+            if (string.IsNullOrWhiteSpace(product.Name) == false) list.Add(nameof(product.Name));
+            if (string.IsNullOrWhiteSpace(product.Description) == false) list.Add(nameof(product.Description));
+            if ((product.MinPrice != null) && (product.MaxPrice != null)) list.Add($"{nameof(product.MinPrice)}{nameof(product.MaxPrice)}");
 
-                return list;
+            return list;
         }
 
         public bool Save(Product product)
@@ -86,18 +85,16 @@ namespace ACSC.BL
                         "CurrentPrice = @CurrentPrice " +
                         "WHERE Id = @Id";
                 }
-
-                using (IDbConnection db = new SqlConnection(dbStr.ToString()))
+                
+                var result = _connection.Execute(sql, new
                 {
-                    var result = db.Execute(sql, new
-                    {
-                        Id = product.Id,
-                        Name = product.Name,
-                        Description = product.Description,
-                        CurrentPrice = product.CurrentPrice,
-                        MarkAs = "Active"
-                    });
-                }
+                    Id = product.Id,
+                    Name = product.Name,
+                    Description = product.Description,
+                    CurrentPrice = product.CurrentPrice,
+                    MarkAs = "Active"
+                });
+                
                 success = true;
             }
             return success;
@@ -109,15 +106,13 @@ namespace ACSC.BL
             string sql = "UPDATE Product SET MarkAs = @MarkAs WHERE Id = @Id";
 
             if (product.Id < 1) return success;
-
-            using (IDbConnection db = new SqlConnection(dbStr.ToString()))
-            {
-                var result = db.Execute(sql, new
-                {
-                    Id = product.Id,
-                    MarkAs = "Removed"
-                });
-            }
+            
+             var result = _connection.Execute(sql, new
+             {
+                 Id = product.Id,
+                 MarkAs = "Removed"
+             });
+            
             success = true;
 
             return success;
@@ -129,7 +124,7 @@ namespace ACSC.BL
 
             if (string.IsNullOrWhiteSpace(product.AllInString) == true && product.MaxPrice == null && product.MinPrice == null)
             {
-                return message = "Please enter a value before searching.";                
+                return message = "Please enter a value before searching.";
             }
 
             var products = GetBy(product);
@@ -138,12 +133,12 @@ namespace ACSC.BL
             {
                 message = "No records found.";
             }
-            return message;            
+            return message;
         }
         public string AddOperation(Product product)
         {
             string message = string.Empty;
-                       
+
             if (Save(product) == true)
             {
                 message = "New record added.";
@@ -177,7 +172,7 @@ namespace ACSC.BL
         public string DeleteOperation(Product product)
         {
             string message = string.Empty;
-            
+
             if (Remove(product) == true)
             {
                 message = "Record removed.";
@@ -188,5 +183,6 @@ namespace ACSC.BL
             }
             return message;
         }
+
     }
 }
