@@ -35,6 +35,7 @@
       <HintPath>..\packages\Dapper.2.0.30\lib\net461\Dapper.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -44,9 +45,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Manager\AddressManager.cs" />
+    <Compile Include="Manager\BaseManager.cs" />
+    <Compile Include="Manager\CustomerManager.cs" />
+    <Compile Include="Manager\Interface\IAddressManager.cs" />
+    <Compile Include="Manager\Interface\ICustomerManager.cs" />
+    <Compile Include="Manager\Interface\IManager.cs" />
+    <Compile Include="Manager\Interface\IOrderItemManager.cs" />
+    <Compile Include="Manager\Interface\IOrderManager.cs" />
+    <Compile Include="Manager\Interface\IProductManager.cs" />
+    <Compile Include="Manager\OrderItemManager.cs" />
+    <Compile Include="Manager\OrderManager.cs" />
+    <Compile Include="Manager\ProductManager.cs" />
     <Compile Include="Models\Address.cs" />
     <Compile Include="Repositories\AddressRepository.cs" />
     <Compile Include="Models\Customer.cs" />
+    <Compile Include="Repositories\BaseRepository.cs" />
     <Compile Include="Repositories\CustomerRepository.cs" />
     <Compile Include="DBConnection.cs" />
     <Compile Include="Models\Order.cs" />
@@ -55,6 +69,7 @@
     <Compile Include="Repositories\Interface\IOrderItemRepository.cs" />
     <Compile Include="Repositories\Interface\IOrderRepository.cs" />
     <Compile Include="Repositories\Interface\IProductRepository.cs" />
+    <Compile Include="Repositories\Interface\IRepository.cs" />
     <Compile Include="Repositories\OrderItemRepository.cs" />
     <Compile Include="Repositories\OrderRepository.cs" />
     <Compile Include="Models\Product.cs" />
@@ -63,6 +78,7 @@
     <Compile Include="Repositories\Interface\ICustomerRepository.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ACSC.BL;
+using ACSC.BL.Manager;
+using ACSC.BL.Manager.Interface;
 
 namespace WindowsFormsACSC
 {
@@ -23,8 +25,6 @@ namespace WindowsFormsACSC
         }
 
         private Order _selectedOrder = new Order();
-        //private DateTime _minDate = DateTime.Now;
-        //private DateTime _maxDate = DateTime.Now;
         private void _fillListView(Order filter)
         {
             listViewOrder.Clear();
@@ -48,7 +48,8 @@ namespace WindowsFormsACSC
             listViewOrder.Columns.Add("Customer Phone Number", 120, HorizontalAlignment.Center);
             listViewOrder.Columns.Add("Shipping Address", 120, HorizontalAlignment.Center);
 
-            var db = new OrderRepository();
+            //var db = new OrderRepository();
+            IOrderManager db = new OrderManager();
             var productList = new List<ListViewItem>();
             var orders = db.GetBy(filter);
 

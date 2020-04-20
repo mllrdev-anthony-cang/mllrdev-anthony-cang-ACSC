@@ -8,18 +8,20 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ACSC.BL;
+using ACSC.BL.Manager;
+using ACSC.BL.Manager.Interface;
 using ACSC.BL.Repositories.Interface;
 
 namespace WindowsFormsACSC
 {
     public partial class FormAddress : Form
     {
-        private IAddressRepository<Address> _iAddressRepository;
+        private IAddressManager _iAddressRepository;
         private Address _address,_addressSelection;
         public FormAddress(Customer customer)
         {
             InitializeComponent();
-            _iAddressRepository = new AddressRepository();
+            _iAddressRepository = new AddressManager();
             _address = _addressSelection = new Address { CustomerId = customer.Id };
             _fillListView(_iAddressRepository.GetBy(_address));
             this.Text = $"{customer.FullName} Address List";
@@ -77,95 +79,7 @@ namespace WindowsFormsACSC
             buttonUpdate.Enabled = false;
             buttonReset.Enabled = false;
             buttonDelete.Enabled = false;
-        }
-        private void _select(ListView.SelectedListViewItemCollection selectedrow, Address setSelected)
-        {
-            if (selectedrow.Count > 0)
-            {
-                setSelected.Id = Convert.ToInt32(selectedrow[0].SubItems[0].Text);
-                setSelected.HouseBuildingStreet = selectedrow[0].SubItems[1].Text;
-                setSelected.Province = selectedrow[0].SubItems[2].Text;
-                setSelected.CityMunicipality = selectedrow[0].SubItems[3].Text;
-                setSelected.Barangay = selectedrow[0].SubItems[4].Text;
-            }
-
-        }
-        private bool _search(Address address)
-        {
-            if (string.IsNullOrWhiteSpace(address.AllInString) == true)
-            {
-                MessageBox.Show("Please enter a value before searching.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-
-            var addresses = _iAddressRepository.GetBy(address);
-
-            if (addresses.Count < 1)
-            {
-                MessageBox.Show("No records found.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            _fillListView(addresses);
-            return true;
-
-        }
-        private bool _add(Address address)
-        {
-            bool success = false;
-
-            if (_iAddressRepository.Save(address) == true)
-            {
-                MessageBox.Show("New record added.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                success = true;
-            }
-            else
-            {
-                MessageBox.Show("Please don't leave the text boxes empty.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            return success;
-
-        }
-        private bool _update(Address selected, Address newValues)
-        {
-            bool success = false;
-
-            if (string.Equals(selected.AllInString, newValues.AllInString) == true)
-            {
-                MessageBox.Show("No changes is made, please check.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            else if (_iAddressRepository.Save(newValues) == true)
-            {
-                MessageBox.Show("Record updated.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return true;
-            }
-            else
-            {
-                MessageBox.Show("Please don't leave the text boxes empty.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            return success;
-        }
-        private bool _delete(Address address)
-        {
-            bool success = false;
-
-            DialogResult dialogResult = MessageBox.Show("Are you sure you want to delete this record?", "Message Box", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
-
-            if (dialogResult == DialogResult.Yes)
-            {
-                if (_iAddressRepository.Remove(address) == true)
-                {
-                    MessageBox.Show("Record removed.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    success = true;
-                }
-                else
-                {
-                    MessageBox.Show($"Failed! No reocrod id passed.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-
-            return success;
-        }
+        }        
         private void buttonCancel_Click(object sender, EventArgs e)
         {
             this.Close();

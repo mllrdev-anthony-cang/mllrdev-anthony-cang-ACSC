@@ -5,22 +5,21 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ACSC.BL.Repositories;
 using ACSC.BL.Repositories.Interface;
 using Dapper;
 
 namespace ACSC.BL
 {    
-    public class CustomerRepository: ICustomerRepository<Customer>
+    internal class CustomerRepository: BaseRepository<Customer>, ICustomerRepository
     {
-        DBConnection dbStr = new DBConnection();
-        
+        internal override string TableName => "Customer";
+
         public List<Customer> GetBy(Customer customer)
-        {        
-            using (IDbConnection db = new SqlConnection(dbStr.ToString()))
-            {
-                var result = db.Query<Customer>(SqlView(customer)).ToList();
-                return result;
-            }
+        {
+            var result = _connection.Query<Customer>(SqlView(customer)).ToList();
+            return result;
+            
         }
 
         private string SqlView(Customer customer)
@@ -81,16 +80,14 @@ namespace ACSC.BL
                     sql = "UPDATE Customer SET FirstName = @FirstName, LastName = @LastName, PhoneNumber = @PhoneNumber WHERE Id = @Id";
                 }
                 
-                using (IDbConnection db = new SqlConnection(dbStr.ToString()))
-                {
-                    var result = db.Execute(sql, new {
-                        Id = customer.Id,
-                        FirstName = customer.FirstName,
-                        LastName = customer.LastName,
-                        PhoneNumber = customer.PhoneNumber,
-                        MarkAs = "Active"
-                    });
-                }
+                var result = _connection.Execute(sql, new {
+                    Id = customer.Id,
+                    FirstName = customer.FirstName,
+                    LastName = customer.LastName,
+                    PhoneNumber = customer.PhoneNumber,
+                    MarkAs = "Active"
+                });
+                
                 success = true;
             }
             return success;
@@ -103,14 +100,12 @@ namespace ACSC.BL
 
             if (customer.Id < 1) return success;
 
-            using (IDbConnection db = new SqlConnection(dbStr.ToString()))
+            var result = _connection.Execute(sql, new
             {
-                var result = db.Execute(sql, new
-                {
-                    Id = customer.Id,
-                    MarkAs = "Removed"
-                });
-            }
+                Id = customer.Id,
+                MarkAs = "Removed"
+            });
+            
             success = true;
 
             return success;

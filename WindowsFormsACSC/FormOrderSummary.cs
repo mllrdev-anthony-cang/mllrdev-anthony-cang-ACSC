@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ACSC.BL;
+using ACSC.BL.Manager;
+using ACSC.BL.Manager.Interface;
 using ACSC.BL.Repositories.Interface;
 
 namespace WindowsFormsACSC
@@ -45,7 +47,8 @@ namespace WindowsFormsACSC
             listViewSummary.Columns.Add("Purchase Price", 120, HorizontalAlignment.Center);
             listViewSummary.Columns.Add("Quantity", 120, HorizontalAlignment.Center);
 
-            IOrderItemRepository<OrderItem> db = new OrderItemRepository();
+            //IOrderItemRepository<OrderItem> db = new OrderItemRepository();
+            IOrderItemManager db = new OrderItemManager();
             var orderItemList = new List<ListViewItem>();
             var orders = db.GetBy(_orderItem);
             decimal? numberOfitems = 0;

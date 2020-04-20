@@ -8,19 +8,21 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ACSC.BL;
+using ACSC.BL.Manager;
+using ACSC.BL.Manager.Interface;
 using ACSC.BL.Repositories.Interface;
 
 namespace WindowsFormsACSC
 {
     public partial class FormCustomer : Form
     {
-        private ICustomerRepository<Customer> _iCustomerRepository;
+        private ICustomerManager _iCustomerRepository;
         private Customer _customerSelection, _customer;
         public FormCustomer()
         {
             InitializeComponent();
             _customer = _customerSelection = new Customer();
-            _iCustomerRepository = new CustomerRepository();
+            _iCustomerRepository = new CustomerManager();
             _initialFormState();
             _fillListView(_iCustomerRepository.GetBy(_customer));
         }        

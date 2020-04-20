@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ACSC.BL.Repositories.Interface
+namespace ACSC.BL.Manager.Interface
 {
-    public interface ICustomerRepository: IRepository<Customer>
+    public interface ICustomerManager: IManager<Customer>
     {
         List<Customer> GetBy(Customer obj);
         bool Save(Customer obj);

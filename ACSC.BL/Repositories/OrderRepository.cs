@@ -5,32 +5,28 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ACSC.BL.Repositories;
 using ACSC.BL.Repositories.Interface;
 using Dapper;
 
 namespace ACSC.BL
 {
-    public class OrderRepository : IOrderRepository<Order>
+    internal class OrderRepository : BaseRepository<Order>, IOrderRepository
     {
-        DBConnection dbStr = new DBConnection();
+        internal override string TableName => "[Order]";
 
         public List<Order> GetBy(Order order)
         {
-            using (IDbConnection db = new SqlConnection(dbStr.ToString()))
-            {
-                var result = db.Query<Order>(SqlView(order)).ToList();
-                return result;
-            }
+            var result = _connection.Query<Order>(SqlView(order)).ToList();
+            return result;
+            
         }
 
         public List<Order> GetLastId()
         {
+            var result = _connection.Query<Order>("SELECT TOP 1 * FROM [Order] ORDER BY Id DESC").ToList();
+            return result;
             
-            using (IDbConnection db = new SqlConnection(dbStr.ToString()))
-            {
-                var result = db.Query<Order>("SELECT TOP 1 * FROM [Order] ORDER BY Id DESC").ToList();
-                return result;
-            }
         }
 
         private string SqlView(Order order)
@@ -109,18 +105,16 @@ namespace ACSC.BL
                         "WHERE Id = @Id";
                 }
 
-                using (IDbConnection db = new SqlConnection(dbStr.ToString()))
+                var result = _connection.Execute(sql, new
                 {
-                    var result = db.Execute(sql, new
-                    {
-                        Id = order.Id,
-                        CustomerId = order.CustomerId,
-                        AddressId = order.AddressId,
-                        OrderDate = order.OrderDate,
-                        TotalAmount = order.TotalAmount,
-                        MarkAs = "Active"
-                    });
-                }
+                    Id = order.Id,
+                    CustomerId = order.CustomerId,
+                    AddressId = order.AddressId,
+                    OrderDate = order.OrderDate,
+                    TotalAmount = order.TotalAmount,
+                    MarkAs = "Active"
+                });
+                
                 success = true;
             }
             return success;
@@ -133,14 +127,12 @@ namespace ACSC.BL
 
             if (order.Id < 1) return success;
 
-            using (IDbConnection db = new SqlConnection(dbStr.ToString()))
+            var result = _connection.Execute(sql, new
             {
-                var result = db.Execute(sql, new
-                {
-                    Id = order.Id,
-                    MarkAs = "Removed"
-                });
-            }
+                Id = order.Id,
+                MarkAs = "Removed"
+            });
+            
             success = true;
 
             return success;
