@@ -17,19 +17,19 @@ namespace ACSC.BL.Manager
             return ((IOrderRepository)Repository).GetBy(obj);
         }
 
-        public List<Order> GetLastId()
+        public new int SaveEntity(Order obj)
         {
-            return ((IOrderRepository)Repository).GetLastId();
+            return Repository.SaveEntity(obj);
         }
 
-        public bool Remove(Order obj)
+        public new bool UpdateEntity(Order obj)
         {
-            return ((IOrderRepository)Repository).Remove(obj);
+            return Repository.UpdateEntity(obj);
         }
 
-        public bool Save(Order obj)
+        public new bool RemoveEntity(int[] id)
         {
-            return ((IOrderRepository)Repository).Save(obj);
+            return Repository.RemoveEntity(id);
         }
     }
 }

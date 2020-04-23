@@ -12,20 +12,22 @@ namespace ACSC.BL
         public int ProductId { get; set; }
         public decimal? Quantity { get; set; }
         public decimal? PurchasePrice { get; set; }
+        public string MarkAs { get; set; }
         public string OrderItemProductName { get; set; }
         public string OrderItemProductDescription { get; set; }
-        public bool Validate
+        
+        public bool isValid
         {
             get
             {
-                bool valid = true;
+                bool isValid = true;
 
-                if (OrderId < 1) valid = false;
-                if (ProductId < 1) valid = false;
-                if (Math.Round(Convert.ToDouble(Quantity), 0) <= 0) valid = false;
-                if (Math.Round(Convert.ToDouble(PurchasePrice), 2) <= 0) valid = false;
+                if (OrderId < 1) isValid = false;
+                if (ProductId < 1) isValid = false;
+                if (Math.Round(Convert.ToDouble(Quantity), 0) <= 0) isValid = false;
+                if (Math.Round(Convert.ToDouble(PurchasePrice), 2) <= 0) isValid = false;
 
-                return valid;
+                return isValid;
             }
         }
 

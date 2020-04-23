@@ -16,17 +16,17 @@ namespace WindowsFormsACSC
 {
     public partial class FormCustomer : Form
     {
-        private ICustomerManager _iCustomerRepository;
-        private Customer _customerSelection, _customer;
+        private ICustomerManager _manager;
+        private Customer _selectedCustomer, _customer;
         public FormCustomer()
         {
             InitializeComponent();
-            _customer = _customerSelection = new Customer();
-            _iCustomerRepository = new CustomerManager();
-            _initialFormState();
-            _fillListView(_iCustomerRepository.GetBy(_customer));
+            _customer = _selectedCustomer = new Customer();
+            _manager = new CustomerManager();
+            DefaultFormState();
+            FillListView(_manager.GetBy(_customer));
         }        
-        private void _fillListView(List<Customer> customers)
+        private void FillListView(List<Customer> customers)
         {
             listViewCustomer.Clear();
             // Set the view to show details.
@@ -58,7 +58,7 @@ namespace WindowsFormsACSC
             }
             listViewCustomer.Items.AddRange(listItem.ToArray());
         }
-        private void _initialFormState()
+        private void DefaultFormState()
         {
             labelCustomer.Text = string.Empty;
             textBoxFirstName.Text = string.Empty;
@@ -81,16 +81,16 @@ namespace WindowsFormsACSC
         private void listViewCustomer_SelectedIndexChanged(object sender, EventArgs e)
         {
             var selectedrow = listViewCustomer.SelectedItems;
-            _customerSelection = new Customer();
+            _selectedCustomer = new Customer();
 
             if (selectedrow.Count > 0)
             {
-                _customerSelection.Id = Convert.ToInt32(selectedrow[0].SubItems[0].Text);
-                _customerSelection.FirstName = selectedrow[0].SubItems[1].Text;
-                _customerSelection.LastName = selectedrow[0].SubItems[2].Text;
-                _customerSelection.PhoneNumber = selectedrow[0].SubItems[3].Text;
+                _selectedCustomer.Id = Convert.ToInt32(selectedrow[0].SubItems[0].Text);
+                _selectedCustomer.FirstName = selectedrow[0].SubItems[1].Text;
+                _selectedCustomer.LastName = selectedrow[0].SubItems[2].Text;
+                _selectedCustomer.PhoneNumber = selectedrow[0].SubItems[3].Text;
             }
-            labelCustomer.Text = $"Name: {_customerSelection.FullName}\r\n\r\nPhone number:{_customerSelection.PhoneNumber}";
+            labelCustomer.Text = $"Name: {_selectedCustomer.FullName}\r\n\r\nPhone number:{_selectedCustomer.PhoneNumber}";
             buttonDelete.Enabled = true;
             buttonAddress.Enabled = true;
             buttonAdd.Text = "Add";
@@ -101,7 +101,7 @@ namespace WindowsFormsACSC
         {
             if (string.Equals(buttonAdd.Text, "Add"))
             {
-                _initialFormState();
+                DefaultFormState();
                 buttonAdd.Text = "Save";
                 buttonSearch.Enabled = false;
                 buttonReset.Enabled = true;
@@ -114,18 +114,22 @@ namespace WindowsFormsACSC
                 PhoneNumber = textBoxPhoneNumber.Text.Trim()
             };
 
-            var addMessage = _iCustomerRepository.AddOperation(customer);
-
-            if (string.Equals(addMessage, "New record added."))
+            //var addMessage = _iCustomerRepository.SaveEntity(customer);
+            if(customer.isValid == true)
             {
-                _initialFormState();
-                _fillListView(_iCustomerRepository.GetBy(customer));
+                customer.Id = _manager.SaveEntity(customer);
+            }
+
+            if (customer.Id > 0)
+            {
+                DefaultFormState();
+                FillListView(_manager.GetBy(customer));
                 buttonReset.Enabled = true;
-                MessageBox.Show(addMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"New record with ID '{customer.Id}' added.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
-                MessageBox.Show(addMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Please don't leave the text boxes empty.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
         }        
@@ -133,9 +137,9 @@ namespace WindowsFormsACSC
         {  
             if(string.Equals("Edit", buttonUpdate.Text))
             {
-                textBoxFirstName.Text = _customerSelection.FirstName;
-                textBoxLastName.Text = _customerSelection.LastName;
-                textBoxPhoneNumber.Text = _customerSelection.PhoneNumber;
+                textBoxFirstName.Text = _selectedCustomer.FirstName;
+                textBoxLastName.Text = _selectedCustomer.LastName;
+                textBoxPhoneNumber.Text = _selectedCustomer.PhoneNumber;
 
                 buttonUpdate.Text = "Update";
                 buttonAdd.Enabled = false;
@@ -147,18 +151,34 @@ namespace WindowsFormsACSC
 
             var customer = new Customer
             {
-                Id = _customerSelection.Id,
+                Id = _selectedCustomer.Id,
                 FirstName = textBoxFirstName.Text.Trim(),
                 LastName = textBoxLastName.Text.Trim(),
                 PhoneNumber = textBoxPhoneNumber.Text.Trim()
             };
 
-            var updateMessage = _iCustomerRepository.UpdateOperation(_customerSelection, customer);
+            //var updateMessage = _iCustomerRepository.UpdateOperation(_customerSelection, customer);
+            string updateMessage = "";//_iAddressRepository.UpdateOperation(_addressSelection, address);
+            bool success = false;
 
-            if (string.Equals(updateMessage, "Record updated."))
+            if (string.Equals(_selectedCustomer.AllInString, customer.AllInString) == true)
             {
-                _initialFormState();
-                _fillListView(_iCustomerRepository.GetBy(customer));
+                updateMessage = "No Changes made, please check.";
+            }
+            else if (customer.isValid == true)
+            {
+                success = _manager.UpdateEntity(customer);
+                updateMessage = "Record Updated.";
+            }
+            else
+            {
+                updateMessage = "Please don't leave the text boxes empty.";
+            }
+
+            if (success)
+            {
+                DefaultFormState();
+                FillListView(_manager.GetBy(customer));
                 buttonReset.Enabled = true;
                 MessageBox.Show(updateMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -169,21 +189,27 @@ namespace WindowsFormsACSC
         }        
         private void buttonDelete_Click(object sender, EventArgs e)
         {
-            DialogResult dialogResult = MessageBox.Show("Are you sure you want to delete this record?", "Message Box", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
+            DialogResult dialogResult = MessageBox.Show("Are you sure you want to delete?", "Message Box", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
 
             if (dialogResult == DialogResult.Yes)
             {
-                var deleteMessage = _iCustomerRepository.DeleteOperation(_customerSelection);
+                //var deleteMessage = _iCustomerRepository.DeleteOperation(_customerSelection);
+                List<int> ids = new List<int>();
 
-                if (string.Equals(deleteMessage, "Record removed."))
+                foreach (ListViewItem item in listViewCustomer.SelectedItems)
                 {
-                    _initialFormState();
-                    _fillListView(_iCustomerRepository.GetBy(_customer));
-                    MessageBox.Show(deleteMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ids.Add(Convert.ToInt32(item.SubItems[0].Text));
+                }
+
+                if (_manager.RemoveEntity(ids.ToArray()))
+                {
+                    DefaultFormState();
+                    FillListView(_manager.GetBy(_customer));
+                    MessageBox.Show("Records removed!", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
-                    MessageBox.Show(deleteMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Failed!", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -194,7 +220,7 @@ namespace WindowsFormsACSC
         }
         private void buttonAddress_Click(object sender, EventArgs e)
         {
-            var newForm = new FormAddress(_customerSelection);            
+            var newForm = new FormAddress(_selectedCustomer);            
             newForm.ShowDialog();
         }        
         private void buttonSearch_Click(object sender, EventArgs e)
@@ -204,16 +230,24 @@ namespace WindowsFormsACSC
                 FirstName = textBoxFirstName.Text.Trim(),
                 LastName = textBoxLastName.Text.Trim(),
                 PhoneNumber = textBoxPhoneNumber.Text.Trim()
-            };           
+            };
 
-            if (string.IsNullOrWhiteSpace(_iCustomerRepository.SearchOperation(customer)) == false)
+            if (string.IsNullOrWhiteSpace(customer.AllInString) == true)
             {
-                MessageBox.Show(_iCustomerRepository.SearchOperation(customer), "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Please enter a value before searching.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            var getBy = _manager.GetBy(customer);
+
+            if (getBy.Count < 1)
+            {
+                MessageBox.Show("No Records Found", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
             {
-                _initialFormState();
-                _fillListView(_iCustomerRepository.GetBy(customer));
+                DefaultFormState();
+                FillListView(_manager.GetBy(customer));
                 buttonReset.Enabled = true;
                 textBoxFirstName.Text = customer.FirstName;
                 textBoxLastName.Text = customer.LastName;
@@ -223,8 +257,8 @@ namespace WindowsFormsACSC
         }
         private void buttonReset_Click(object sender, EventArgs e)
         {
-            _initialFormState();
-            _fillListView(_iCustomerRepository.GetBy(_customer));
+            DefaultFormState();
+            FillListView(_manager.GetBy(_customer));
         }
         private void FormCustomer_FormClosing(object sender, FormClosingEventArgs e)
         {

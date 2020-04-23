@@ -16,19 +16,19 @@ namespace WindowsFormsACSC
 {
     public partial class FormAddress : Form
     {
-        private IAddressManager _iAddressRepository;
-        private Address _address,_addressSelection;
+        private IAddressManager _manager;
+        private Address _address,_selectedAddress;
         public FormAddress(Customer customer)
         {
             InitializeComponent();
-            _iAddressRepository = new AddressManager();
-            _address = _addressSelection = new Address { CustomerId = customer.Id };
-            _fillListView(_iAddressRepository.GetBy(_address));
+            _manager = new AddressManager();
+            _address = _selectedAddress = new Address { CustomerId = customer.Id };
+            FillListView(_manager.GetBy(_address));
             this.Text = $"{customer.FullName} Address List";
-            _initialFormState();
+            InitialFormState();
         }       
         
-        private void _fillListView(List<Address> addresses)
+        private void FillListView(List<Address> addresses)
         {
             listViewAddress.Clear();
             // Set the view to show details.
@@ -56,12 +56,12 @@ namespace WindowsFormsACSC
                 item.SubItems.Add(address.Province);
                 item.SubItems.Add(address.CityMunicipality);
                 item.SubItems.Add(address.Barangay);
-
                 listItem.Add(item);
             }
+
             listViewAddress.Items.AddRange(listItem.ToArray());
         }
-        private void _initialFormState()
+        private void InitialFormState()
         {
             textBoxHouse.Text = string.Empty;
             textBoxProvince.Text = string.Empty;
@@ -87,18 +87,18 @@ namespace WindowsFormsACSC
         private void listViewAddress_SelectedIndexChanged(object sender, EventArgs e)
         {
             var selectedrow = listViewAddress.SelectedItems;
-            _addressSelection = new Address { CustomerId = _address.CustomerId};
+            _selectedAddress = new Address { CustomerId = _address.CustomerId};
 
             if (selectedrow.Count > 0)
             {
-                _addressSelection.Id = Convert.ToInt32(selectedrow[0].SubItems[0].Text);
-                _addressSelection.HouseBuildingStreet = selectedrow[0].SubItems[1].Text;
-                _addressSelection.Province = selectedrow[0].SubItems[2].Text;
-                _addressSelection.CityMunicipality = selectedrow[0].SubItems[3].Text;
-                _addressSelection.Barangay = selectedrow[0].SubItems[4].Text;
+                _selectedAddress.Id = Convert.ToInt32(selectedrow[0].SubItems[0].Text);
+                _selectedAddress.HouseBuildingStreet = selectedrow[0].SubItems[1].Text;
+                _selectedAddress.Province = selectedrow[0].SubItems[2].Text;
+                _selectedAddress.CityMunicipality = selectedrow[0].SubItems[3].Text;
+                _selectedAddress.Barangay = selectedrow[0].SubItems[4].Text;
             }
-            labelAddress.Text = _addressSelection.FullAddress;
 
+            labelAddress.Text = _selectedAddress.FullAddress;
             buttonDelete.Enabled = true;
             buttonAdd.Text = "Add";
             buttonReset.Enabled = true;
@@ -112,17 +112,25 @@ namespace WindowsFormsACSC
                 Province = textBoxProvince.Text.Trim(),
                 CityMunicipality = textBoxCity.Text.Trim(),
                 Barangay = textBoxBarangay.Text.Trim(),
-                CustomerId = _addressSelection.CustomerId
+                CustomerId = _selectedAddress.CustomerId
             };
 
-            if (string.IsNullOrWhiteSpace(_iAddressRepository.SearchOperation(address)) == false)
+            if (string.IsNullOrWhiteSpace(address.AllInString) == true)
             {
-                MessageBox.Show(_iAddressRepository.SearchOperation(address), "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Please enter a value before searching.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            var getBy = _manager.GetBy(address);
+
+            if (getBy.Count < 1)
+            {
+                MessageBox.Show("No Records Found", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
             {
-                _initialFormState();
-                _fillListView(_iAddressRepository.GetBy(address));
+                InitialFormState();
+                FillListView(getBy);
                 buttonReset.Enabled = true;
                 textBoxHouse.Text = address.HouseBuildingStreet;
                 textBoxProvince.Text = address.Province;
@@ -134,43 +142,47 @@ namespace WindowsFormsACSC
         {
             if (string.Equals(buttonAdd.Text, "Add"))
             {
-                _initialFormState();
+                InitialFormState();
                 buttonAdd.Text = "Save";
                 buttonSearch.Enabled = false;
                 buttonReset.Enabled = true;
-
                 return;
             }
+
             var address = new Address
             {
                 HouseBuildingStreet = textBoxHouse.Text.Trim(),
                 Province = textBoxProvince.Text.Trim(),
                 CityMunicipality = textBoxCity.Text.Trim(),
                 Barangay = textBoxBarangay.Text.Trim(),
-                CustomerId = _addressSelection.CustomerId
+                CustomerId = _selectedAddress.CustomerId
             };
-            var addMessage = _iAddressRepository.AddOperation(address);
 
-            if (string.Equals(addMessage, "New record added."))
+            if (address.isValid == true)
             {
-                _initialFormState();
-                _fillListView(_iAddressRepository.GetBy(address));
+                address.Id = _manager.SaveEntity(address);
+            }
+
+            if (address.Id > 0)
+            {
+                InitialFormState();
+                FillListView(_manager.GetBy(address));
                 buttonReset.Enabled = true;
-                MessageBox.Show(addMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"New record with ID '{address.Id}' added.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
-                MessageBox.Show(addMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Please don't leave the text boxes empty.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void buttonUpdate_Click(object sender, EventArgs e)
         {
             if (string.Equals("Edit", buttonUpdate.Text))
             {
-                textBoxHouse.Text = _addressSelection.HouseBuildingStreet;
-                textBoxProvince.Text = _addressSelection.Province;
-                textBoxCity.Text = _addressSelection.CityMunicipality;
-                textBoxBarangay.Text = _addressSelection.Barangay;
+                textBoxHouse.Text = _selectedAddress.HouseBuildingStreet;
+                textBoxProvince.Text = _selectedAddress.Province;
+                textBoxCity.Text = _selectedAddress.CityMunicipality;
+                textBoxBarangay.Text = _selectedAddress.Barangay;
 
                 buttonUpdate.Text = "Update";
                 buttonAdd.Enabled = false;
@@ -181,19 +193,34 @@ namespace WindowsFormsACSC
 
             var address = new Address
             {
-                Id = _addressSelection.Id,
+                Id = _selectedAddress.Id,
                 HouseBuildingStreet = textBoxHouse.Text.Trim(),
                 Province = textBoxProvince.Text.Trim(),
                 CityMunicipality = textBoxCity.Text.Trim(),
                 Barangay = textBoxBarangay.Text.Trim(),
-                CustomerId = _addressSelection.CustomerId
+                CustomerId = _selectedAddress.CustomerId
             };
-            var updateMessage = _iAddressRepository.UpdateOperation(_addressSelection, address);
+            string updateMessage = "";//_iAddressRepository.UpdateOperation(_addressSelection, address);
+            bool success = false;
 
-            if (string.Equals(updateMessage, "Record updated."))
+            if(string.Equals(_selectedAddress.AllInString, address.AllInString) == true)
             {
-                _initialFormState();
-                _fillListView(_iAddressRepository.GetBy(address));
+                updateMessage = "No Changes made, please check.";
+            }
+            else if (address.isValid == true)
+            {
+                success = _manager.UpdateEntity(address);
+                updateMessage = "Record Updated.";
+            }
+            else
+            {
+                updateMessage = "Please don't leave the text boxes empty.";
+            }     
+
+            if (success)
+            {
+                InitialFormState();
+                FillListView(_manager.GetBy(address));
                 buttonReset.Enabled = true;
                 MessageBox.Show(updateMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -204,28 +231,33 @@ namespace WindowsFormsACSC
         }
         private void buttonDelete_Click(object sender, EventArgs e)
         {
-            DialogResult dialogResult = MessageBox.Show("Are you sure you want to delete this record?", "Message Box", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
+            DialogResult dialogResult = MessageBox.Show("Are you sure you want to delete?", "Message Box", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
 
             if (dialogResult == DialogResult.Yes)
             {
-                var deleteMessage = _iAddressRepository.DeleteOperation(_addressSelection);
+                List<int> ids = new List<int>();
 
-                if (string.Equals(deleteMessage, "Record removed."))
+                foreach (ListViewItem item in listViewAddress.SelectedItems)
                 {
-                    _initialFormState();
-                    _fillListView(_iAddressRepository.GetBy(_address));
-                    MessageBox.Show(deleteMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ids.Add(Convert.ToInt32(item.SubItems[0].Text));
+                }
+
+                if (_manager.RemoveEntity(ids.ToArray()))
+                {
+                    InitialFormState();
+                    FillListView(_manager.GetBy(_address));
+                    MessageBox.Show("Record removed.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
-                    MessageBox.Show(deleteMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Removed Failed!", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
         private void buttonReset_Click(object sender, EventArgs e)
         {
-            _initialFormState();
-            _fillListView(_iAddressRepository.GetBy(_address));
+            InitialFormState();
+            FillListView(_manager.GetBy(_address));
         }
         private void FormAddress_FormClosing(object sender, FormClosingEventArgs e)
         {

@@ -39,7 +39,7 @@ namespace ACSC.BLTests
             bool expected = true;
 
             //-- Act
-            bool actual = customer.Validate;
+            bool actual = customer.isValid;
 
             //-- Assert
             Assert.AreEqual(expected, actual);

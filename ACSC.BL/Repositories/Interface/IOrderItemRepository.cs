@@ -9,7 +9,5 @@ namespace ACSC.BL.Repositories.Interface
     public interface IOrderItemRepository: IRepository<OrderItem>
     {
         List<OrderItem> GetBy(OrderItem obj);
-        bool Save(OrderItem obj);
-        bool Remove(OrderItem obj);
     }
 }

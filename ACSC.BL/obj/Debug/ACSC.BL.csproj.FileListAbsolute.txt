@@ -8,3 +8,5 @@ C:\Users\User\Documents\Visual Studio 2017\Projects\ACSC\ACSC.BL\bin\Debug\Dappe
 C:\Users\User\Documents\Visual Studio 2017\Projects\ACSC\ACSC.BL\bin\Debug\Dapper.xml
 C:\Users\User\Documents\Visual Studio 2017\Projects\ACSC\ACSC.BL\obj\Debug\ACSC.BL.csproj.CopyComplete
 C:\Users\User\Documents\Visual Studio 2017\Projects\ACSC\ACSC.BL\bin\Debug\ACSC.BL.dll.config
+C:\Users\User\Documents\Visual Studio 2017\Projects\ACSC\ACSC.BL\bin\Debug\log4net.dll
+C:\Users\User\Documents\Visual Studio 2017\Projects\ACSC\ACSC.BL\bin\Debug\log4net.xml

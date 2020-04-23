@@ -16,17 +16,17 @@ namespace WindowsFormsACSC
 {
     public partial class FormProduct : Form
     {
-        private IProductManager _iProductRepository;
-        private Product _product, _productSelection;
+        private IProductManager _manager;
+        private Product _product, _selectedProduct;
         public FormProduct()
         {
             InitializeComponent();
-            _iProductRepository = new ProductManager();
-            _product = _productSelection = new Product();
-            _fillListView(_iProductRepository.GetBy(_product));
-            _initialFormState();
+            _manager = new ProductManager();
+            _product = _selectedProduct = new Product();
+            FillListView(_manager.GetBy(_product));
+            InitialFormState();
         }        
-        private void _fillListView(List<Product> products)
+        private void FillListView(List<Product> products)
         {
             listViewProduct.Clear();
             // Set the view to show details.
@@ -58,7 +58,7 @@ namespace WindowsFormsACSC
             }
             listViewProduct.Items.AddRange(listItem.ToArray());
         }
-        private void _initialFormState()
+        private void InitialFormState()
         {
             labelProduct.Text = string.Empty;
             textBoxName.Text = string.Empty;
@@ -86,16 +86,17 @@ namespace WindowsFormsACSC
         private void listViewProduct_SelectedIndexChanged(object sender, EventArgs e)
         {
             var selectedrow = listViewProduct.SelectedItems;
-            _productSelection = new Product();
+            _selectedProduct = new Product();
 
             if (selectedrow.Count > 0)
             {
-                _productSelection.Id = Convert.ToInt32(selectedrow[0].SubItems[0].Text);
-                _productSelection.Name = selectedrow[0].SubItems[1].Text;
-                _productSelection.Description = selectedrow[0].SubItems[2].Text;
-                _productSelection.CurrentPrice = Convert.ToDecimal(selectedrow[0].SubItems[3].Text);
+                _selectedProduct.Id = Convert.ToInt32(selectedrow[0].SubItems[0].Text);
+                _selectedProduct.Name = selectedrow[0].SubItems[1].Text;
+                _selectedProduct.Description = selectedrow[0].SubItems[2].Text;
+                _selectedProduct.CurrentPrice = Convert.ToDecimal(selectedrow[0].SubItems[3].Text);
             }
-            labelProduct.Text = $"{_productSelection.Name}\r\n{_productSelection.Description}\r\n{_productSelection.CurrentPrice} Php";
+
+            labelProduct.Text = $"{_selectedProduct.Name}\r\n{_selectedProduct.Description}\r\n{_selectedProduct.CurrentPrice} Php";
             buttonDelete.Enabled = true;
             buttonAdd.Text = "Add";
             buttonReset.Enabled = true;
@@ -118,14 +119,23 @@ namespace WindowsFormsACSC
                 product.MinPrice = null;
             }
 
-            if(string.IsNullOrWhiteSpace(_iProductRepository.SearchOperation(product)) == false)
+
+            if (string.IsNullOrWhiteSpace(product.AllInString) == true)
             {
-                MessageBox.Show(_iProductRepository.SearchOperation(product), "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Please enter a value before searching.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            var getBy = _manager.GetBy(product);
+
+            if (getBy.Count < 1)
+            {
+                MessageBox.Show("No Records Found", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
             {
-                _initialFormState();
-                _fillListView(_iProductRepository.GetBy(product));
+                InitialFormState();
+                FillListView(_manager.GetBy(product));
                 buttonReset.Enabled = true;
                 textBoxName.Text = product.Name;
                 textBoxDescription.Text = product.Description;
@@ -137,7 +147,7 @@ namespace WindowsFormsACSC
         {
             if (string.Equals(buttonAdd.Text, "Add"))
             {
-                _initialFormState();
+                InitialFormState();
                 buttonAdd.Text = "Save";
                 buttonSearch.Enabled = false;
                 buttonReset.Enabled = true;
@@ -148,6 +158,7 @@ namespace WindowsFormsACSC
 
                 return;
             }
+
             decimal currentPrice;
             var product = new Product
             {
@@ -156,18 +167,22 @@ namespace WindowsFormsACSC
                 CurrentPrice = decimal.TryParse(textBoxCurrentPrice.Text.Trim(), out currentPrice) ? currentPrice : currentPrice
             };
 
-            var addMessage = _iProductRepository.AddOperation(product);
-
-            if (string.Equals(addMessage, "New record added."))
+            //var addMessage = _iProductRepository.AddOperation(product);
+            if (product.isValid == true)
             {
-                _initialFormState();
-                _fillListView(_iProductRepository.GetBy(product));
+                product.Id = _manager.SaveEntity(product);
+            }
+
+            if (product.Id > 0)
+            {
+                InitialFormState();
+                FillListView(_manager.GetBy(product));
                 buttonReset.Enabled = true;
-                MessageBox.Show(addMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"New record with ID '{product.Id}' added.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
-                MessageBox.Show(addMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Please don't leave the text boxes empty.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
         }
@@ -175,9 +190,9 @@ namespace WindowsFormsACSC
         {
             if (string.Equals("Edit", buttonUpdate.Text))
             {
-                textBoxName.Text = _productSelection.Name;
-                textBoxDescription.Text = _productSelection.Description;
-                textBoxCurrentPrice.Text = _productSelection.CurrentPrice.ToString();                
+                textBoxName.Text = _selectedProduct.Name;
+                textBoxDescription.Text = _selectedProduct.Description;
+                textBoxCurrentPrice.Text = _selectedProduct.CurrentPrice.ToString();                
 
                 buttonUpdate.Text = "Update";
                 buttonAdd.Enabled = false;
@@ -190,21 +205,37 @@ namespace WindowsFormsACSC
 
                 return;
             }
+
             decimal currentPrice;
             var productNewProp = new Product
             {
-                Id = _productSelection.Id,
+                Id = _selectedProduct.Id,
                 Name = textBoxName.Text.Trim(),
                 Description = textBoxDescription.Text.Trim(),
                 CurrentPrice = decimal.TryParse(textBoxCurrentPrice.Text.Trim(), out currentPrice) ? currentPrice : currentPrice
             };
 
-            var updateMessage = _iProductRepository.UpdateOperation(_productSelection, productNewProp);
+            string updateMessage;
+            bool success = false;
 
-            if (string.Equals(updateMessage,"Record updated."))
+            if (string.Equals(_selectedProduct.AllInString, productNewProp.AllInString) == true)
             {
-                _initialFormState();
-                _fillListView(_iProductRepository.GetBy(productNewProp));
+                updateMessage = "No Changes made, please check.";
+            }
+            else if (productNewProp.isValid == true)
+            {
+                success = _manager.UpdateEntity(productNewProp);
+                updateMessage = "Record Updated.";
+            }
+            else
+            {
+                updateMessage = "Please don't leave the text boxes empty.";
+            }
+
+            if (success)
+            {
+                InitialFormState();
+                FillListView(_manager.GetBy(productNewProp));
                 buttonReset.Enabled = true;
                 MessageBox.Show(updateMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -215,21 +246,26 @@ namespace WindowsFormsACSC
         }
         private void buttonDelete_Click(object sender, EventArgs e)
         {
-            DialogResult dialogResult = MessageBox.Show("Are you sure you want to delete this record?", "Message Box", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
+            DialogResult dialogResult = MessageBox.Show("Are you sure you want to delete?", "Message Box", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);
 
             if (dialogResult == DialogResult.Yes)
             {
-                var deleteMessage = _iProductRepository.DeleteOperation(_productSelection);
+                List<int> ids = new List<int>();
 
-                if (string.Equals(deleteMessage, "Record removed."))
+                foreach (ListViewItem item in listViewProduct.SelectedItems)
                 {
-                    _initialFormState();
-                    _fillListView(_iProductRepository.GetBy(_product));
-                    MessageBox.Show(deleteMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ids.Add(Convert.ToInt32(item.SubItems[0].Text));
+                }
+
+                if (_manager.RemoveEntity(ids.ToArray()))
+                {
+                    InitialFormState();
+                    FillListView(_manager.GetBy(_product));
+                    MessageBox.Show("Records removed!", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
-                    MessageBox.Show(deleteMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Failed!", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -239,8 +275,8 @@ namespace WindowsFormsACSC
         }
         private void buttonReset_Click(object sender, EventArgs e)
         {
-            _initialFormState();
-            _fillListView(_iProductRepository.GetBy(_product));
+            InitialFormState();
+            FillListView(_manager.GetBy(_product));
         }
         private void FormProduct_FormClosing(object sender, FormClosingEventArgs e)
         {

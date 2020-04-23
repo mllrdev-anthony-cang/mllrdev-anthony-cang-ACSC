@@ -13,20 +13,21 @@ namespace ACSC.BL
         public string Province { get; set; }
         public string CityMunicipality { get; set; }
         public string Barangay { get; set; }
-        public int CustomerId { get; set; }        
-        public bool Validate
+        public int CustomerId { get; set; }
+        public string MarkAs { get; set; }
+        public bool isValid
         {
             get
             {
-                bool valid = true;
+                bool isValid = true;
 
-                if (string.IsNullOrWhiteSpace(HouseBuildingStreet)) valid = false;
-                if (string.IsNullOrWhiteSpace(Province)) valid = false;
-                if (string.IsNullOrWhiteSpace(CityMunicipality)) valid = false;
-                if (string.IsNullOrWhiteSpace(Barangay)) valid = false;
-                if (CustomerId < 1) valid = false;
+                if (string.IsNullOrWhiteSpace(HouseBuildingStreet)) isValid = false;
+                if (string.IsNullOrWhiteSpace(Province)) isValid = false;
+                if (string.IsNullOrWhiteSpace(CityMunicipality)) isValid = false;
+                if (string.IsNullOrWhiteSpace(Barangay)) isValid = false;
+                if (CustomerId < 1) isValid = false;
 
-                return valid;
+                return isValid;
             }
         }
 

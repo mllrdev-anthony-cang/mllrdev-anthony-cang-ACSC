@@ -41,79 +41,57 @@ namespace ACSC.BL
 
             foreach (var validitem in validlist)
             {
-                if (validlist.IndexOf(validitem) > 0) sql += " AND";
-                if (string.Equals(validitem, nameof(orderitem.OrderId))) sql += $" O.OrderId = {orderitem.OrderId}";
-                if (string.Equals(validitem, nameof(orderitem.ProductId))) sql += $" O.ProductId = {orderitem.ProductId}";
+                if (validlist.IndexOf(validitem) > 0)
+                {
+                    sql += " AND";
+                }
+
+                if (string.Equals(validitem, nameof(orderitem.OrderId)))
+                {
+                    sql += $" O.OrderId = {orderitem.OrderId}";
+                }
+                else if (string.Equals(validitem, nameof(orderitem.ProductId)))
+                {
+                    sql += $" O.ProductId = {orderitem.ProductId}";
+                }
             }
+
             return sql;
         }
 
 
         private List<string> ValidateSearchField(OrderItem orderitem)
         {
-                var list = new List<string>();
+            var list = new List<string>();
 
-                if (orderitem.OrderId > 0) list.Add(nameof(orderitem.OrderId));
-                if (orderitem.ProductId > 0) list.Add(nameof(orderitem.ProductId));
-
-                return list;
-            
-        }
-
-        public bool Save(OrderItem orderitem)
-        {
-            bool success = false;
-            string sql;
-
-            if (orderitem.Validate == true)
+            if (orderitem.OrderId > 0)
             {
-                var existlist = GetBy(orderitem);
-                if (existlist.Count() < 1)
-                {
-                    sql = "INSERT INTO OrderItem" +
-                        "(OrderId, ProductId, PurchasePrice, Quantity, MarkAs) " +
-                        "VALUES" +
-                        "(@OrderId, @ProductId, @PurchasePrice, @Quantity, @MarkAs)";
-                }
-                else
-                {
-                    sql = "UPDATE OrderItem SET " +
-                        "PurchasePrice = @PurchasePrice, " +
-                        "Quantity = @Quantity " +
-                        "WHERE OrderId = @OrderId AND ProductId = @ProductId";
-                }
-
-                var result = _connection.Execute(sql, new
-                {
-                    OrderId = orderitem.OrderId,
-                    ProductId = orderitem.ProductId,
-                    PurchasePrice = orderitem.PurchasePrice,
-                    Quantity = orderitem.Quantity,
-                    MarkAs = "Active"
-                });
-                
-                success = true;
+                list.Add(nameof(orderitem.OrderId));
             }
-            return success;
+
+            if (orderitem.ProductId > 0)
+            {
+                list.Add(nameof(orderitem.ProductId));
+            }
+
+            return list;
+            
         }
 
-        public bool Remove(OrderItem orderitem)
+        public new int SaveEntity(OrderItem orderitem)
         {
-            bool success = false;
-            string sql = "UPDATE OrderItem SET MarkAs = @MarkAs WHERE OrderId = @OrderId AND ProductId = @ProductId";
+            orderitem.MarkAs = $"{MarkAsOption.Active}";
+            return base.SaveEntity(orderitem);
+        }
 
-            if (orderitem.OrderId < 1 || orderitem.ProductId < 1) return success;
+        bool IRepository<OrderItem>.UpdateEntity(OrderItem obj)
+        {
+            throw new NotImplementedException();
+        }
 
-            var result = _connection.Execute(sql, new
-             {
-                 OrderId = orderitem.OrderId,
-                 ProductId = orderitem.ProductId,
-                 MarkAs = "Removed"
-             });
-            
-            success = true;
-
-            return success;
+        bool IRepository<OrderItem>.RemoveEntity(int[] id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

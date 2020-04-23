@@ -8,6 +8,8 @@ namespace ACSC.BL.Manager.Interface
 {
     public interface IManager<T> where T : class
     {
-        
+        int SaveEntity(T obj);
+        bool UpdateEntity(T obj);
+        bool RemoveEntity(int[] id);
     }
 }

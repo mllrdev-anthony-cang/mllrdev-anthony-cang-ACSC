@@ -19,11 +19,11 @@ namespace WindowsFormsACSC
         public FormOrder()
         {
             InitializeComponent();
-            _initializeListViewOrderItem();
-            _initialTabOrderItemState();
-            _addressClearAll();
-            _initialTabProductState(_getProducts, _dbProduct);
-            _initialTabCustomerState(_getCustomers, _dbCustomer);
+            InitializeListViewOrderItem();
+            InitialTabOrderState();
+            AddressClearAll();
+            InitialTabProductState(_getProducts, _productManager);
+            InitialTabCustomerState(_getCustomers, _customerManager);
         }
 
         private List<OrderItem> _selectedProducts = new List<OrderItem>();
@@ -32,17 +32,14 @@ namespace WindowsFormsACSC
         private bool _orderSaved = false;
 
         private Product _selectedProduct = new Product(),_getProducts = new Product();
-        //private IProductRepository<Product> _dbProduct = new ProductRepository();
-        private IProductManager _dbProduct = new ProductManager();
+        private IProductManager _productManager = new ProductManager();
         private decimal _maxPrice,_minPrice;
         private Customer _selectedCustomer = new Customer(), _getCustomers = new Customer();
-        //private ICustomerRepository<Customer> _dbCustomer = new CustomerRepository();
-        private ICustomerManager _dbCustomer = new CustomerManager();
+        private ICustomerManager _customerManager = new CustomerManager();
         private Address _selectedAddress = new Address(), _getAddresses = new Address();
-        //private IAddressRepository<Address> _dbAddress = new AddressRepository();
-        IAddressManager _dbAddress = new AddressManager();
+        IAddressManager _addressManager = new AddressManager();
 
-        private void _fillListView(List<Product> products)
+        private void FillListView(List<Product> products)
         {
             listViewProduct.Clear();
             // Set the view to show details.
@@ -74,7 +71,7 @@ namespace WindowsFormsACSC
             }
             listViewProduct.Items.AddRange(listItem.ToArray());
         }
-        private void _fillListView(List<Customer> customers)
+        private void FillListView(List<Customer> customers)
         {
             listViewCustomer.Clear();
             // Set the view to show details.
@@ -106,7 +103,7 @@ namespace WindowsFormsACSC
             }
             listViewCustomer.Items.AddRange(listItem.ToArray());
         }
-        private void _fillListView(List<Address> addresses)
+        private void FillListView(List<Address> addresses)
         {
             listViewAddress.Clear();
             // Set the view to show details.
@@ -139,7 +136,7 @@ namespace WindowsFormsACSC
             }
             listViewAddress.Items.AddRange(listItem.ToArray());
         }
-        private void _fillListView(Address filter)
+        private void FillListView(Address filter)
         {
             listViewAddress.Clear();
             // Set the view to show details.
@@ -160,7 +157,7 @@ namespace WindowsFormsACSC
             listViewAddress.Columns.Add("Barangay", 120, HorizontalAlignment.Center);
 
             //AddressRepository db = new AddressRepository();
-            var db = _dbAddress;
+            var db = _addressManager;
             var addressList = new List<ListViewItem>();
             var addresses = db.GetBy(filter);
 
@@ -176,10 +173,10 @@ namespace WindowsFormsACSC
             }
             listViewAddress.Items.AddRange(addressList.ToArray());
         }
-        private void _initialTabProductState(Product product, IProductManager db)
+        private void InitialTabProductState(Product product, IProductManager db)
         {
             var customers = db.GetBy(product);
-            _fillListView(customers);
+            FillListView(customers);
 
             labelProduct.Text = string.Empty;
             textBoxProductName.Text = string.Empty;
@@ -203,7 +200,7 @@ namespace WindowsFormsACSC
             buttonProductReset.Enabled = false;
 
         }
-        private void _initialTabOrderItemState()
+        private void InitialTabOrderState()
         {
             buttonOrderItemBack.Enabled = true;
             buttonOrderItemUpdate.Enabled = false;
@@ -216,10 +213,10 @@ namespace WindowsFormsACSC
             textBoxOrderItemQuantity.Text = string.Empty;
             labelOrderItem.Text = string.Empty;
         }
-        private void _initialTabCustomerState(Customer customer, ICustomerManager db)
+        private void InitialTabCustomerState(Customer customer, ICustomerManager db)
         {
             var customers = db.GetBy(customer);
-            _fillListView(customers);
+            FillListView(customers);
 
             labelCustomer.Text = string.Empty;
             textBoxCustomerFirstName.Text = string.Empty;
@@ -232,10 +229,10 @@ namespace WindowsFormsACSC
             buttonCustomerBack.Enabled = true;
 
         }
-        private void _initialTabAddressState(Address address, IAddressManager db)
+        private void InitialTabAddressState(Address address, IAddressManager db)
         {
             var customers = db.GetBy(address);
-            _fillListView(customers);
+            FillListView(customers);
 
             textBoxAddressHouse.Text = string.Empty;
             textBoxAddressProvince.Text = string.Empty;
@@ -246,7 +243,7 @@ namespace WindowsFormsACSC
             buttonAddressSearch.Enabled = true;
             buttonAddressReset.Enabled = false;
         }
-        private void _initializeListViewOrderItem()
+        private void InitializeListViewOrderItem()
         {
             listViewOrderItem.Clear();
             // Set the view to show details.
@@ -266,7 +263,7 @@ namespace WindowsFormsACSC
             listViewOrderItem.Columns.Add("Purchase Price", 120, HorizontalAlignment.Center);
             listViewOrderItem.Columns.Add("Quantity", 120, HorizontalAlignment.Center);
         }
-        private bool _search(Product product, IProductManager db)
+        private bool IsMatch(Product product, IProductManager db)
         {
             if (string.IsNullOrWhiteSpace(product.AllInString) == true && product.MaxPrice == null && product.MinPrice == null)
             {
@@ -281,11 +278,11 @@ namespace WindowsFormsACSC
                 MessageBox.Show("No records found.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            _fillListView(products);
+            FillListView(products);
             return true;
 
         }                
-        private bool _search(Customer customer, ICustomerManager db)
+        private bool IsMatch(Customer customer, ICustomerManager db)
         {
             if (string.IsNullOrWhiteSpace(customer.AllInString) == true)
             {
@@ -300,11 +297,11 @@ namespace WindowsFormsACSC
                 MessageBox.Show("No records found.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            _fillListView(customers);
+            FillListView(customers);
             return true;
 
         }                
-        private bool _search(Address address, IAddressManager db)
+        private bool IsMatch(Address address, IAddressManager db)
         {
             if (string.IsNullOrWhiteSpace(address.AllInString) == true)
             {
@@ -319,11 +316,11 @@ namespace WindowsFormsACSC
                 MessageBox.Show("No records found.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            _fillListView(addresses);
+            FillListView(addresses);
             return true;
 
         }
-        private void _addressClearAll()
+        private void AddressClearAll()
         {
             buttonAddressNext.Enabled = false;
 
@@ -333,10 +330,10 @@ namespace WindowsFormsACSC
             textBoxAddressBarangay.Text = string.Empty;
 
             var address = new Address { CustomerId = _selectedCustomer.Id };
-            _fillListView(address);
+            FillListView(address);
             _selectedAddress = new Address();
         }
-        private void _generateSummary()
+        private void GenerateSummary()
         {
             listViewSummary.Clear();
             // Set the view to show details.
@@ -372,8 +369,8 @@ namespace WindowsFormsACSC
             labelBillAndShip.Text = $"Customer: {_selectedCustomer.FullName}\r\n\r\nPhone Number:{_selectedCustomer.PhoneNumber}" +
                 $"\r\n\r\nAddress: {_selectedAddress.HouseBuildingStreet}, {_selectedAddress.Barangay}, {_selectedAddress.CityMunicipality}, {_selectedAddress.Province}";
 
-            labelOrderSummary.Text = $"Subtotal ({numberOfitems} items): {Math.Round(Convert.ToDouble(_totalAmount), 2).ToString("0.00")}" +
-                $"\r\n\r\nTotal: {Math.Round(Convert.ToDouble(_totalAmount), 2).ToString("0,000.00")}";
+            labelOrderSummary.Text = $"Subtotal ({numberOfitems} items): {Math.Round(Convert.ToDouble(_totalAmount), 2).ToString("C")}" +
+                $"\r\n\r\nTotal: {Math.Round(Convert.ToDouble(_totalAmount), 2).ToString("C")}";
         }
         private void buttonAdd_Click(object sender, EventArgs e)
         {
@@ -400,7 +397,7 @@ namespace WindowsFormsACSC
                 PurchasePrice = _selectedProduct.CurrentPrice
             };
 
-            if (orderitem.Validate == false)
+            if (orderitem.isValid == false)
             {
                 MessageBox.Show("Please enter a valid quantity.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 textBoxProductQuantity.Focus();
@@ -490,9 +487,9 @@ namespace WindowsFormsACSC
                 product.MinPrice = null;
             }
 
-            if (_search(product, _dbProduct) == true)
+            if (IsMatch(product, _productManager) == true)
             {
-                _initialTabProductState(product, _dbProduct);
+                InitialTabProductState(product, _productManager);
                 buttonProductReset.Enabled = true;
                 textBoxProductName.Text = product.Name;
                 textBoxProductDescription.Text = product.Description;
@@ -567,7 +564,7 @@ namespace WindowsFormsACSC
             {
                 selectedrow[0].SubItems[4].Text = selectedproductquantity.ToString();
                 //_orderItemClearAll();
-                _initialTabOrderItemState();
+                InitialTabOrderState();
                 MessageBox.Show($"Item {_selectedOrderItem.Name} quantiy updated from {_selectedOrderItemQuantity} to {selectedproductquantity}", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             
@@ -581,14 +578,14 @@ namespace WindowsFormsACSC
             {
                 listViewOrderItem.Items.RemoveAt(listViewOrderItem.SelectedIndices[0]);
                 //_orderItemClearAll();
-                _initialTabOrderItemState();
+                InitialTabOrderState();
                 MessageBox.Show($"Item {_selectedOrderItem.Name} removed.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             
         }
         private void buttonOrderItemClear_Click(object sender, EventArgs e)
         {
-            _initialTabOrderItemState();
+            InitialTabOrderState();
         }
         private void buttonOrderItemNext_Click(object sender, EventArgs e)
         {
@@ -607,9 +604,9 @@ namespace WindowsFormsACSC
                 PhoneNumber = textBoxCustomerPhoneNumber.Text.Trim()
             };
             //_fillListView(customer);
-            if (_search(customer, _dbCustomer) == true)
+            if (IsMatch(customer, _customerManager) == true)
             {
-                _initialTabCustomerState(customer, _dbCustomer);
+                InitialTabCustomerState(customer, _customerManager);
                 buttonCustomerReset.Enabled = true;
                 textBoxCustomerFirstName.Text = customer.FirstName;
                 textBoxCustomerLastName.Text = customer.LastName;
@@ -634,7 +631,7 @@ namespace WindowsFormsACSC
             _getAddresses.CustomerId = _selectedCustomer.Id;
             buttonCustomerNext.Enabled = true;
             //_addressClearAll();
-            _initialTabAddressState(_getAddresses,_dbAddress);
+            InitialTabAddressState(_getAddresses,_addressManager);
         }
         private void buttonCustomerNext_Click(object sender, EventArgs e)
         {
@@ -677,9 +674,9 @@ namespace WindowsFormsACSC
                 CustomerId = _selectedCustomer.Id
             };
             //_fillListView(address);
-            if (_search(address, _dbAddress) == true)
+            if (IsMatch(address, _addressManager) == true)
             {
-                _initialTabAddressState(address, _dbAddress);
+                InitialTabAddressState(address, _addressManager);
                 buttonAddressReset.Enabled = true;
                 textBoxAddressHouse.Text = address.HouseBuildingStreet;
                 textBoxAddressProvince.Text = address.Province;
@@ -694,7 +691,7 @@ namespace WindowsFormsACSC
             if (selectedrow.Count > 0)
             {
                 tabControlOrder.SelectedTab = tabPageSummary;
-                _generateSummary();
+                GenerateSummary();
             }
             
         }
@@ -704,7 +701,7 @@ namespace WindowsFormsACSC
         }        
         private void tabPageSummary_Enter(object sender, EventArgs e)
         {
-            _generateSummary();
+            GenerateSummary();
         }
         private void buttonSummaryPlaceOrder_Click(object sender, EventArgs e)
         {
@@ -720,30 +717,40 @@ namespace WindowsFormsACSC
             };
             //IOrderRepository<Order> orderDB = new OrderRepository();
             IOrderManager orderDB = new OrderManager();
+            order.Id = orderDB.SaveEntity(order);
 
-            if(orderDB.Save(order) == false)
+            if(order.Id < 1)
             {
                 MessageBox.Show("Your order is incomplete, please check.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            var retrieveSaveOrder = orderDB.GetLastId();
+
+            //var saveOrderId = save;            
             var orderSummaryRows = listViewSummary.Items;
-            //IOrderItemRepository<OrderItem> orderItemDB = new OrderItemRepository();
             IOrderItemManager orderItemDB = new OrderItemManager();
             var saveCount = 0;
+            var orderitemlist = new List<OrderItem>();
 
             for (var i = 0; i < orderSummaryRows.Count; i++)
             {
                 var orderItem = new OrderItem
                 {
-                    OrderId = retrieveSaveOrder[0].Id,
+                    OrderId = order.Id,
                     ProductId = Convert.ToInt32(orderSummaryRows[i].SubItems[0].Text),
                     PurchasePrice = Convert.ToDecimal(orderSummaryRows[i].SubItems[3].Text),
                     Quantity = Convert.ToDecimal(orderSummaryRows[i].SubItems[4].Text)
                 };
 
-                if (orderItemDB.Save(orderItem) == true) saveCount++;
+                var save = orderItemDB.SaveEntity(orderItem);
+
+                if (save>0)
+                {
+                    saveCount++;
+                    orderitemlist.Add(orderItem);
+                }
             }
+
+            order.OrderItems = orderitemlist;
 
             MessageBox.Show($"Your order of {orderSummaryRows.Count} of {saveCount} items is placed. ", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
             _orderSaved = true;
@@ -755,7 +762,7 @@ namespace WindowsFormsACSC
         }
         private void buttonProductReset_Click(object sender, EventArgs e)
         {
-            _initialTabProductState(_getProducts, _dbProduct);
+            InitialTabProductState(_getProducts, _productManager);
         }
         private void textBoxOrderItemQuantity_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -787,13 +794,13 @@ namespace WindowsFormsACSC
         }
         private void buttonCustomerReset_Click(object sender, EventArgs e)
         {
-            _initialTabCustomerState(_getCustomers, _dbCustomer);
+            InitialTabCustomerState(_getCustomers, _customerManager);
             _selectedCustomer = new Customer();
             _selectedAddress = new Address();
         }
         private void buttonAddressReset_Click(object sender, EventArgs e)
         {
-            _initialTabAddressState(_getAddresses, _dbAddress);
+            InitialTabAddressState(_getAddresses, _addressManager);
             _selectedAddress = new Address();
         }
         private void tabPageShippingAddress_Enter(object sender, EventArgs e)
