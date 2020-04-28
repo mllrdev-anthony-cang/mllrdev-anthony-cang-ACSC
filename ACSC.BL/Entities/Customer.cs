@@ -14,17 +14,18 @@ namespace ACSC.BL
         public int Id { get; set; }
         public string MarkAs { get; set; }
 
-        public bool isValid
+        public bool IsValid
         {
             get
             {            
-            bool isValid = true;
+                bool isValid = true;
+                
+                if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName) || string.IsNullOrWhiteSpace(PhoneNumber))
+                {
+                    isValid = false;
+                }                    
 
-            if (string.IsNullOrWhiteSpace(FirstName)) isValid = false;
-            if (string.IsNullOrWhiteSpace(LastName)) isValid = false;
-            if (string.IsNullOrWhiteSpace(PhoneNumber)) isValid = false;
-
-            return isValid;
+                return isValid;
             }
         }
 

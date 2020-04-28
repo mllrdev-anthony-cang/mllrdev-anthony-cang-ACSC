@@ -22,3 +22,4 @@ C:\Users\User\Documents\Visual Studio 2017\Projects\ACSC\WindowsFormsACSC\obj\De
 C:\Users\User\Documents\Visual Studio 2017\Projects\ACSC\WindowsFormsACSC\bin\Debug\ACSC.BL.dll.config
 C:\Users\User\Documents\Visual Studio 2017\Projects\ACSC\WindowsFormsACSC\bin\Debug\log4net.dll
 C:\Users\User\Documents\Visual Studio 2017\Projects\ACSC\WindowsFormsACSC\bin\Debug\log4net.xml
+C:\Users\User\Documents\Visual Studio 2017\Projects\ACSC\WindowsFormsACSC\obj\Debug\WindowsFormsACSC.FormCustomerOrderHistory.resources

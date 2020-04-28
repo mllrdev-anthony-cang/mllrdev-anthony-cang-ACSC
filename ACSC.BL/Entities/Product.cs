@@ -16,15 +16,19 @@ namespace ACSC.BL
         public decimal? MaxPrice { get; set; }
         public string MarkAs { get; set; }
 
-        public bool isValid
+        public bool IsValid
         {
             get
             {
                 bool isValid = true;
 
-                if (string.IsNullOrWhiteSpace(Name)) isValid = false;
-                if (string.IsNullOrWhiteSpace(Description)) isValid = false;
-                if (CurrentPrice == null || Math.Round(Convert.ToDouble(CurrentPrice),2) <= 0) isValid = false;
+                if (string.IsNullOrWhiteSpace(Name) 
+                    || string.IsNullOrWhiteSpace(Description)
+                    || CurrentPrice == null || (Math.Round(Convert.ToDouble(CurrentPrice),2) <= 0))
+                {
+                    isValid = false;
+                }
+                    
 
                 return isValid;
             }

@@ -16,16 +16,16 @@ namespace ACSC.BL
         public string OrderItemProductName { get; set; }
         public string OrderItemProductDescription { get; set; }
         
-        public bool isValid
+        public bool IsValid
         {
             get
             {
                 bool isValid = true;
-
-                if (OrderId < 1) isValid = false;
-                if (ProductId < 1) isValid = false;
-                if (Math.Round(Convert.ToDouble(Quantity), 0) <= 0) isValid = false;
-                if (Math.Round(Convert.ToDouble(PurchasePrice), 2) <= 0) isValid = false;
+                
+                if (OrderId < 1 || ProductId < 1 || (Math.Round(Convert.ToDouble(Quantity), 0) <= 0) || (Math.Round(Convert.ToDouble(PurchasePrice), 2) <= 0))
+                {
+                    isValid = false;
+                }                   
 
                 return isValid;
             }

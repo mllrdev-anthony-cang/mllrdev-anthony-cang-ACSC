@@ -17,10 +17,11 @@ namespace ACSC.BL
 
         public List<Order> GetBy(Order order)
         {
-            return base.GetByEntity(order, SqlView(order));
+            var generatedSQL = GenerateSQL(order);
+            return base.Get(order, generatedSQL);
         }
 
-        private string SqlView(Order order)
+        private string GenerateSQL(Order order)
         {
             string sql = $"SELECT TOP 1000 O.Id, O.AddressId, O.CustomerId, O.TotalAmount, O.OrderDate, " +
                 $"CONCAT(C.FirstName ,' ', C.LastName) AS 'CustomerName', C.PhoneNumber AS 'CustomerPhoneNumber', " +
@@ -122,20 +123,20 @@ namespace ACSC.BL
             return list;
         }
 
-        public new int SaveEntity(Order order)
+        public new int Save(Order order)
         {
             order.MarkAs = $"{MarkAsOption.Active}";
-            return base.SaveEntity(order);
+            return base.Save(order);
         }
 
-        bool IRepository<Order>.UpdateEntity(Order order)
+        bool IRepository<Order>.Update(Order order)
         {
-            return base.UpdateEntity(order);
+            return base.Update(order);
         }
 
-        bool IRepository<Order>.RemoveEntity(int[] id)
+        bool IRepository<Order>.Delete(int[] id)
         {
-            return base.RemoveEntity(id);
+            return base.Delete(id);
         }
     }
 }

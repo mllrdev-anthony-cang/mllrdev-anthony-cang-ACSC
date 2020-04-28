@@ -54,7 +54,7 @@ namespace ACSC.BLTests
             };
 
             product.CurrentPrice = decimal.TryParse(".01", out _currentPrice) ? _currentPrice : _currentPrice;
-            var actual = product.isValid;
+            var actual = product.IsValid;
 
             //-- Act
 

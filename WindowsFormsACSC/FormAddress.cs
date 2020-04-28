@@ -158,9 +158,9 @@ namespace WindowsFormsACSC
                 CustomerId = _selectedAddress.CustomerId
             };
 
-            if (address.isValid == true)
+            if (address.IsValid == true)
             {
-                address.Id = _manager.SaveEntity(address);
+                address.Id = _manager.Save(address);
             }
 
             if (address.Id > 0)
@@ -207,9 +207,9 @@ namespace WindowsFormsACSC
             {
                 updateMessage = "No Changes made, please check.";
             }
-            else if (address.isValid == true)
+            else if (address.IsValid == true)
             {
-                success = _manager.UpdateEntity(address);
+                success = _manager.Update(address);
                 updateMessage = "Record Updated.";
             }
             else
@@ -242,7 +242,7 @@ namespace WindowsFormsACSC
                     ids.Add(Convert.ToInt32(item.SubItems[0].Text));
                 }
 
-                if (_manager.RemoveEntity(ids.ToArray()))
+                if (_manager.Delete(ids.ToArray()))
                 {
                     InitialFormState();
                     FillListView(_manager.GetBy(_address));

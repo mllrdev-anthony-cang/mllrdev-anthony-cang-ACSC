@@ -20,7 +20,7 @@ namespace ACSC.BL.Repositories
             try
             {
                 _connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DBACSC"].ConnectionString);
-                _connection.Open();
+                //_connection.Open();
             }
             catch (Exception ex)
             {
@@ -29,7 +29,7 @@ namespace ACSC.BL.Repositories
             
         }
         internal enum MarkAsOption{ Active,Removed }
-        internal List<T> GetByEntity(T obj, string sql)
+        internal List<T> Get(T obj, string sql)
         {
             
             try
@@ -44,7 +44,7 @@ namespace ACSC.BL.Repositories
             }
         }
 
-        internal int SaveEntity(T obj)
+        internal int Save(T obj)
         {           
 
             try
@@ -75,7 +75,7 @@ namespace ACSC.BL.Repositories
             }
         }
 
-        internal bool UpdateEntity(T obj)
+        internal bool Update(T obj)
         {
             try
             {
@@ -92,7 +92,7 @@ namespace ACSC.BL.Repositories
             }
         }
 
-        internal bool RemoveEntity(int[] id)
+        internal bool Delete(int[] id)
         {           
             
             try

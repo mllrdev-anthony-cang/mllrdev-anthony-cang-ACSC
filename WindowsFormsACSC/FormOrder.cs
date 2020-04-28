@@ -397,7 +397,7 @@ namespace WindowsFormsACSC
                 PurchasePrice = _selectedProduct.CurrentPrice
             };
 
-            if (orderitem.isValid == false)
+            if (orderitem.IsValid == false)
             {
                 MessageBox.Show("Please enter a valid quantity.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 textBoxProductQuantity.Focus();
@@ -717,7 +717,7 @@ namespace WindowsFormsACSC
             };
             //IOrderRepository<Order> orderDB = new OrderRepository();
             IOrderManager orderDB = new OrderManager();
-            order.Id = orderDB.SaveEntity(order);
+            order.Id = orderDB.Save(order);
 
             if(order.Id < 1)
             {
@@ -741,7 +741,7 @@ namespace WindowsFormsACSC
                     Quantity = Convert.ToDecimal(orderSummaryRows[i].SubItems[4].Text)
                 };
 
-                var save = orderItemDB.SaveEntity(orderItem);
+                var save = orderItemDB.Save(orderItem);
 
                 if (save>0)
                 {

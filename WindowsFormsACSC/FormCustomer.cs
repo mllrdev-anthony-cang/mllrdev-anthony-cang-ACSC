@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using ACSC.BL;
 using ACSC.BL.Manager;
 using ACSC.BL.Manager.Interface;
+using ACSC.BL.Models;
 using ACSC.BL.Repositories.Interface;
 
 namespace WindowsFormsACSC
@@ -115,9 +116,9 @@ namespace WindowsFormsACSC
             };
 
             //var addMessage = _iCustomerRepository.SaveEntity(customer);
-            if(customer.isValid == true)
+            if(customer.IsValid == true)
             {
-                customer.Id = _manager.SaveEntity(customer);
+                customer.Id = _manager.Save(customer);
             }
 
             if (customer.Id > 0)
@@ -165,9 +166,9 @@ namespace WindowsFormsACSC
             {
                 updateMessage = "No Changes made, please check.";
             }
-            else if (customer.isValid == true)
+            else if (customer.IsValid == true)
             {
-                success = _manager.UpdateEntity(customer);
+                success = _manager.Update(customer);
                 updateMessage = "Record Updated.";
             }
             else
@@ -201,7 +202,7 @@ namespace WindowsFormsACSC
                     ids.Add(Convert.ToInt32(item.SubItems[0].Text));
                 }
 
-                if (_manager.RemoveEntity(ids.ToArray()))
+                if (_manager.Delete(ids.ToArray()))
                 {
                     DefaultFormState();
                     FillListView(_manager.GetBy(_customer));
@@ -259,7 +260,8 @@ namespace WindowsFormsACSC
         {
             DefaultFormState();
             FillListView(_manager.GetBy(_customer));
-        }
+        }                
+
         private void FormCustomer_FormClosing(object sender, FormClosingEventArgs e)
         {
             DialogResult dialogResult = MessageBox.Show($"Are you sure you want to cancel {this.Text} window?", "Message Box", MessageBoxButtons.YesNo, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button2);

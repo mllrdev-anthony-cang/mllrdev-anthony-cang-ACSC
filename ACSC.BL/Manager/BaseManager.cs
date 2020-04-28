@@ -11,19 +11,19 @@ namespace ACSC.BL.Manager
     {
         public abstract IRepository<T> Repository { get; }
         
-        public int SaveEntity(T obj)
+        public int Save(T obj)
         {
-            return Repository.SaveEntity(obj);
+            return Repository.Save(obj);
         }
 
-        public bool UpdateEntity(T obj)
+        public bool Update(T obj)
         {
-            return Repository.UpdateEntity(obj);
+            return Repository.Update(obj);
         }
 
-        public bool RemoveEntity(int[] id)
+        public bool Delete(int[] id)
         {
-            return Repository.RemoveEntity(id);
+            return Repository.Delete(id);
         }
     }
 }

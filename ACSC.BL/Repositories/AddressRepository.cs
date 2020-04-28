@@ -17,14 +17,15 @@ namespace ACSC.BL
 
         public List<Address> GetBy(Address address)
         {
-            return base.GetByEntity(address, SqlView(address));
+            string generatedSQL = GenerateSQL(address);
+            return base.Get(address, generatedSQL);
         }
-        private string SqlView(Address address)
+        private string GenerateSQL(Address address)
         {
             string sql = $"SELECT TOP 1000 * FROM {TableName} WHERE {nameof(address.MarkAs)} = '{MarkAsOption.Active}' AND {nameof(address.CustomerId)} = {address.CustomerId}";
-            var validlist = ValidateSearchField(address);
+            var validatedFields = ValidateSearchField(address);
 
-            if (validlist.Count() < 1)
+            if (validatedFields.Count() < 1)
             {
                 return sql;
             }
@@ -33,9 +34,9 @@ namespace ACSC.BL
                 sql += " AND";
             }
 
-            foreach (var validitem in validlist)
+            foreach (var validitem in validatedFields)
             {
-                if (validlist.IndexOf(validitem) > 0)
+                if (validatedFields.IndexOf(validitem) > 0)
                 {
                     sql += " AND";
                 }
@@ -94,22 +95,22 @@ namespace ACSC.BL
                 list.Add(nameof(address.Barangay));
             }
 
-                return list;
+            return list;
         }
 
-        public new int SaveEntity(Address address)
+        public new int Save(Address address)
         {
             address.MarkAs = $"{MarkAsOption.Active}";
-            return base.SaveEntity(address);
+            return base.Save(address);
         }
         
-        public new bool UpdateEntity(Address address)
+        public new bool Update(Address address)
         {
-            return base.UpdateEntity(address);
+            return base.Update(address);
         }
-        public new bool RemoveEntity(int[] id)
+        public new bool Delete(int[] id)
         {
-            return base.RemoveEntity(id);
+            return base.Delete(id);
         }      
 
     }

@@ -17,15 +17,15 @@ namespace ACSC.BL
 
         public List<OrderItem> GetBy(OrderItem orderitem)
         {
-            var result = _connection.Query<OrderItem>(SqlView(orderitem)).ToList();
-            return result;
-            
+            var generatedSQL = GenerateSQL(orderitem);
+            return base.Get(orderitem, generatedSQL);
+            //return _connection.Query<OrderItem>(generatedSQL).ToList();    
+
         }
 
-        private string SqlView(OrderItem orderitem)
-        {
-            string sql = $"SELECT TOP 1000 * FROM OrderItem WHERE MarkAs = 'Active'";
-            sql = "SELECT TOP 1000 O.OrderId, O.ProductId, O.PurchasePrice, O.Quantity, " +
+        private string GenerateSQL(OrderItem orderitem)
+        {            
+            string sql = "SELECT TOP 1000 O.OrderId, O.ProductId, O.PurchasePrice, O.Quantity, " +
                 "P.Name AS 'OrderItemProductName', P.Description AS 'OrderItemProductDescription' FROM [OrderItem] O " +
                 "INNER JOIN Product P ON P.Id = O.ProductId WHERE O.MarkAs = 'Active'";
             var validlist = ValidateSearchField(orderitem);
@@ -78,18 +78,18 @@ namespace ACSC.BL
             
         }
 
-        public new int SaveEntity(OrderItem orderitem)
+        public new int Save(OrderItem orderitem)
         {
             orderitem.MarkAs = $"{MarkAsOption.Active}";
-            return base.SaveEntity(orderitem);
+            return base.Save(orderitem);
         }
 
-        bool IRepository<OrderItem>.UpdateEntity(OrderItem obj)
+        bool IRepository<OrderItem>.Update(OrderItem obj)
         {
             throw new NotImplementedException();
         }
 
-        bool IRepository<OrderItem>.RemoveEntity(int[] id)
+        bool IRepository<OrderItem>.Delete(int[] id)
         {
             throw new NotImplementedException();
         }

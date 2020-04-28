@@ -17,9 +17,9 @@ namespace ACSC.BL.Manager
             return ((IOrderItemRepository)Repository).GetBy(obj);
         }
 
-        public new int SaveEntity(OrderItem obj)
+        public new int Save(OrderItem obj)
         {
-            return Repository.SaveEntity(obj);
+            return Repository.Save(obj);
         }
     }
 }

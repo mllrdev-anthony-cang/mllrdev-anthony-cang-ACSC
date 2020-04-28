@@ -17,10 +17,11 @@ namespace ACSC.BL
         
         public List<Product> GetBy(Product product)
         {
-            return base.GetByEntity(product, SqlView(product));
+            var generatedSQL = GenerateSQL(product);
+            return base.Get(product, generatedSQL);
         }
 
-        public string SqlView(Product product)
+        public string GenerateSQL(Product product)
         {
             string sql = $"SELECT TOP 1000 * FROM {TableName} WHERE {nameof(product.MarkAs)} = '{MarkAsOption.Active}'";
             var validlist = ValidateSearchField(product);
@@ -91,20 +92,20 @@ namespace ACSC.BL
         }
 
        
-        public new int SaveEntity(Product product)
+        public new int Save(Product product)
         {
             product.MarkAs = $"{MarkAsOption.Active}";
-            return base.SaveEntity(product);
+            return base.Save(product);
         }
 
-        public new bool UpdateEntity(Product product)
+        public new bool Update(Product product)
         {
-            return base.UpdateEntity(product);
+            return base.Update(product);
         }
 
-        public new bool RemoveEntity(int[] id)
+        public new bool Delete(int[] id)
         {
-            return base.RemoveEntity(id);
+            return base.Delete(id);
         }
     }
 }

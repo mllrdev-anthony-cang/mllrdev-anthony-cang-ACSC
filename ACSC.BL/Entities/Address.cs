@@ -15,17 +15,17 @@ namespace ACSC.BL
         public string Barangay { get; set; }
         public int CustomerId { get; set; }
         public string MarkAs { get; set; }
-        public bool isValid
+        public bool IsValid
         {
             get
             {
                 bool isValid = true;
 
-                if (string.IsNullOrWhiteSpace(HouseBuildingStreet)) isValid = false;
-                if (string.IsNullOrWhiteSpace(Province)) isValid = false;
-                if (string.IsNullOrWhiteSpace(CityMunicipality)) isValid = false;
-                if (string.IsNullOrWhiteSpace(Barangay)) isValid = false;
-                if (CustomerId < 1) isValid = false;
+                if (string.IsNullOrWhiteSpace(HouseBuildingStreet) || string.IsNullOrWhiteSpace(Province) 
+                    || string.IsNullOrWhiteSpace(CityMunicipality) || string.IsNullOrWhiteSpace(Barangay) || CustomerId < 1)
+                {
+                    isValid = false;
+                }                        
 
                 return isValid;
             }

@@ -168,9 +168,9 @@ namespace WindowsFormsACSC
             };
 
             //var addMessage = _iProductRepository.AddOperation(product);
-            if (product.isValid == true)
+            if (product.IsValid == true)
             {
-                product.Id = _manager.SaveEntity(product);
+                product.Id = _manager.Save(product);
             }
 
             if (product.Id > 0)
@@ -222,9 +222,9 @@ namespace WindowsFormsACSC
             {
                 updateMessage = "No Changes made, please check.";
             }
-            else if (productNewProp.isValid == true)
+            else if (productNewProp.IsValid == true)
             {
-                success = _manager.UpdateEntity(productNewProp);
+                success = _manager.Update(productNewProp);
                 updateMessage = "Record Updated.";
             }
             else
@@ -257,7 +257,7 @@ namespace WindowsFormsACSC
                     ids.Add(Convert.ToInt32(item.SubItems[0].Text));
                 }
 
-                if (_manager.RemoveEntity(ids.ToArray()))
+                if (_manager.Delete(ids.ToArray()))
                 {
                     InitialFormState();
                     FillListView(_manager.GetBy(_product));
