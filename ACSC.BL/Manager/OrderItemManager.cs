@@ -17,14 +17,9 @@ namespace ACSC.BL.Manager
             return ((IOrderItemRepository)Repository).GetBy(obj);
         }
 
-        public bool Remove(OrderItem obj)
+        public new int Save(OrderItem obj)
         {
-            return ((IOrderItemRepository)Repository).Remove(obj);
-        }
-
-        public bool Save(OrderItem obj)
-        {
-            return ((IOrderItemRepository)Repository).Save(obj);
+            return Repository.Save(obj);
         }
     }
 }

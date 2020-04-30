@@ -8,6 +8,8 @@ namespace ACSC.BL.Repositories.Interface
 {
     public interface IRepository<T> where T: class
     {
-
+        int Save(T obj);
+        bool Update(T obj);
+        bool Delete(int[] id);
     }
 }

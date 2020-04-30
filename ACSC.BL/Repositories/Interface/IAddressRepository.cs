@@ -9,11 +9,5 @@ namespace ACSC.BL.Repositories.Interface
     public interface IAddressRepository: IRepository<Address>
     {
         List<Address> GetBy(Address obj);
-        bool Save(Address obj);
-        bool Remove(Address obj);
-        string SearchOperation(Address obj);
-        string AddOperation(Address obj);
-        string UpdateOperation(Address obj1, Address obj2);
-        string DeleteOperation(Address obj);
     }
 }

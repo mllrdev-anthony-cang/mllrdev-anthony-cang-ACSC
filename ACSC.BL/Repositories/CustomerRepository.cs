@@ -17,14 +17,13 @@ namespace ACSC.BL
 
         public List<Customer> GetBy(Customer customer)
         {
-            var result = _connection.Query<Customer>(SqlView(customer)).ToList();
-            return result;
-            
+            var generatedSQL = GenerateSQL(customer);
+            return base.Get(customer, generatedSQL);
         }
 
-        private string SqlView(Customer customer)
+        private string GenerateSQL(Customer customer)
         {
-            string sql = "SELECT TOP 1000 * FROM Customer WHERE MarkAs = 'Active'";
+            string sql = $"SELECT TOP 1000 * FROM {TableName} WHERE {nameof(customer.MarkAs)} = '{MarkAsOption.Active}'";
             var validlist = ValidateSearchField(customer);
 
             if(validlist.Count() < 1)
@@ -38,143 +37,73 @@ namespace ACSC.BL
 
             foreach (var validitem in validlist)
             {
-                if (validlist.IndexOf(validitem) > 0) sql += " AND";
-
-                if (string.Equals(validitem, "Id"))
+                if (validlist.IndexOf(validitem) > 0)
                 {
-                    sql += $" Id = {customer.Id}";
+                    sql += " AND";
+                }
+
+                if (string.Equals(validitem, nameof(customer.Id)))
+                {
+                    sql += $" {nameof(customer.Id)} = {customer.Id}";
                     break;
                 }
-                if (string.Equals(validitem, "FirstName")) sql += $" FirstName LIKE '{customer.FirstName}%'";
-                if (string.Equals(validitem, "LastName")) sql += $" LastName LIKE '{customer.LastName}%'";
-                if (string.Equals(validitem, "PhoneNumber")) sql += $" PhoneNumber LIKE '{customer.PhoneNumber}%'";
+                else if (string.Equals(validitem, nameof(customer.FirstName)))
+                {
+                    sql += $" {nameof(customer.FirstName)} LIKE '{customer.FirstName}%'";
+                }
+                else if (string.Equals(validitem, nameof(customer.LastName)))
+                {
+                    sql += $" {nameof(customer.LastName)} LIKE '{customer.LastName}%'";
+                }
+                else if (string.Equals(validitem, nameof(customer.PhoneNumber)))
+                {
+                    sql += $" {nameof(customer.PhoneNumber)} LIKE '{customer.PhoneNumber}%'";
+                }
             }
+
             return sql;
         }
 
         private List<string> ValidateSearchField(Customer customer)
         {
-                var list = new List<string>();
+            var list = new List<string>();
 
-                if (customer.Id > 0) list.Add("Id");
-                if (string.IsNullOrWhiteSpace(customer.FirstName) == false) list.Add(nameof(customer.FirstName));
-                if (string.IsNullOrWhiteSpace(customer.LastName) == false) list.Add(nameof(customer.LastName));
-                if (string.IsNullOrWhiteSpace(customer.PhoneNumber) == false) list.Add(nameof(customer.PhoneNumber));
+            if (customer.Id > 0)
+            {
+                list.Add(nameof(customer.Id));
+            }
 
-                return list;
+            if (string.IsNullOrWhiteSpace(customer.FirstName) == false)
+            {
+                list.Add(nameof(customer.FirstName));
+            }
+
+            if (string.IsNullOrWhiteSpace(customer.LastName) == false)
+            {
+                list.Add(nameof(customer.LastName));
+            }
+
+            if (string.IsNullOrWhiteSpace(customer.PhoneNumber) == false)
+            {
+                list.Add(nameof(customer.PhoneNumber));
+            }
+
+            return list;
         }
 
-        public bool Save(Customer customer)
+        public new int Save(Customer customer)
         {
-            bool success = false;
-            string sql;
-
-            if (customer.Validate == true)
-            {
-                if(customer.Id < 1)
-                {
-                    sql = "INSERT INTO Customer(FirstName, LastName, PhoneNumber, MarkAs) VALUES(@FirstName, @LastName, @PhoneNumber, @MarkAs)";
-                }
-                else
-                {
-                    sql = "UPDATE Customer SET FirstName = @FirstName, LastName = @LastName, PhoneNumber = @PhoneNumber WHERE Id = @Id";
-                }
-                
-                var result = _connection.Execute(sql, new {
-                    Id = customer.Id,
-                    FirstName = customer.FirstName,
-                    LastName = customer.LastName,
-                    PhoneNumber = customer.PhoneNumber,
-                    MarkAs = "Active"
-                });
-                
-                success = true;
-            }
-            return success;
+            customer.MarkAs = $"{MarkAsOption.Active}";
+            return base.Save(customer);
         }
 
-        public bool Remove(Customer customer)
+        public new bool Update(Customer customer)
         {
-            bool success = false;
-            string sql = "UPDATE Customer SET MarkAs = @MarkAs WHERE Id = @Id";
-
-            if (customer.Id < 1) return success;
-
-            var result = _connection.Execute(sql, new
-            {
-                Id = customer.Id,
-                MarkAs = "Removed"
-            });
-            
-            success = true;
-
-            return success;
+            return base.Update(customer);
         }
-
-        public string SearchOperation(Customer customer)
+        public new bool Delete(int[] id)
         {
-            string message = string.Empty;
-
-            if (string.IsNullOrWhiteSpace(customer.AllInString) == true)
-            {
-                return message = "Please enter a value before searching.";
-            }
-
-            var customers = GetBy(customer);
-
-            if (customers.Count < 1)
-            {
-                message = "No records found.";
-            }
-            return message;
-        }
-        public string AddOperation(Customer customer)
-        {
-            string message = string.Empty;
-
-            if (Save(customer) == true)
-            {
-                message = "New record added.";
-            }
-            else
-            {
-                message = "Please don't leave the text boxes empty.";
-            }
-
-            return message;
-
-        }
-        public string UpdateOperation(Customer oldPropVal, Customer newPropVal)
-        {
-            string message = string.Empty;
-
-            if (string.Equals(oldPropVal.AllInString, newPropVal.AllInString) == true)
-            {
-                message = "No changes is made, please check.";
-            }
-            else if (Save(newPropVal) == true)
-            {
-                message = "Record updated.";
-            }
-            else
-            {
-                message = "Please don't leave the text boxes empty.";
-            }
-            return message;
-        }
-        public string DeleteOperation(Customer customer)
-        {
-            string message = string.Empty;
-
-            if (Remove(customer) == true)
-            {
-                message = "Record removed.";
-            }
-            else
-            {
-                message = "Failed! No record passed.";
-            }
-            return message;
+            return base.Delete(id);
         }
     }
 }

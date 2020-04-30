@@ -12,39 +12,24 @@ namespace ACSC.BL.Manager
     {
         public override IRepository<Address> Repository => new AddressRepository();
 
-        public string AddOperation(Address obj)
-        {
-            return ((IAddressRepository)Repository).AddOperation(obj);
-        }
-
-        public string DeleteOperation(Address obj)
-        {
-            return ((IAddressRepository)Repository).DeleteOperation(obj);
-        }
-
         public List<Address> GetBy(Address obj)
         {
-            return ((IAddressRepository)Repository).GetBy(obj);
+            return ((IAddressRepository)Repository).GetBy(obj);            
         }
 
-        public bool Remove(Address obj)
+        public new int Save(Address obj)
         {
-            return ((IAddressRepository)Repository).Remove(obj);
+            return Repository.Save(obj);
         }
 
-        public bool Save(Address obj)
+        public new bool Update(Address obj)
         {
-            return ((IAddressRepository)Repository).Save(obj);
+            return Repository.Update(obj);
         }
 
-        public string SearchOperation(Address obj)
+        public new bool Delete(int[] id)
         {
-            return ((IAddressRepository)Repository).SearchOperation(obj);
-        }
-
-        public string UpdateOperation(Address obj1, Address obj2)
-        {
-            return ((IAddressRepository)Repository).UpdateOperation(obj1,obj2);
+            return Repository.Delete(id);
         }
     }
 }

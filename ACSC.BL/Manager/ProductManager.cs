@@ -16,35 +16,19 @@ namespace ACSC.BL.Manager
         {
             return ((IProductRepository)Repository).GetBy(obj);
         }
-
-        public bool Save(Product obj)
+        public new int Save(Product obj)
         {
-            return ((IProductRepository)Repository).Save(obj);
+            return Repository.Save(obj);
         }
 
-        public bool Remove(Product obj)
+        public new bool Update(Product obj)
         {
-            return ((IProductRepository)Repository).Remove(obj);
+            return Repository.Update(obj);
         }
 
-        public string SearchOperation(Product obj)
+        public new bool Delete(int[] id)
         {
-            return ((IProductRepository)Repository).SearchOperation(obj);
-        }
-
-        public string AddOperation(Product obj)
-        {
-            return ((IProductRepository)Repository).AddOperation(obj);
-        }
-
-        public string UpdateOperation(Product obj1, Product obj2)
-        {
-            return ((IProductRepository)Repository).UpdateOperation(obj1, obj2);
-        }
-
-        public string DeleteOperation(Product obj)
-        {
-            return ((IProductRepository)Repository).DeleteOperation(obj);
+            return Repository.Delete(id);
         }
     }
 }

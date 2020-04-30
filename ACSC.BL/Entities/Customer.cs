@@ -12,18 +12,20 @@ namespace ACSC.BL
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
         public int Id { get; set; }
+        public string MarkAs { get; set; }
 
-        public bool Validate
+        public bool IsValid
         {
             get
             {            
-            bool valid = true;
+                bool isValid = true;
+                
+                if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName) || string.IsNullOrWhiteSpace(PhoneNumber))
+                {
+                    isValid = false;
+                }                    
 
-            if (string.IsNullOrWhiteSpace(FirstName)) valid = false;
-            if (string.IsNullOrWhiteSpace(LastName)) valid = false;
-            if (string.IsNullOrWhiteSpace(PhoneNumber)) valid = false;
-
-            return valid;
+                return isValid;
             }
         }
 

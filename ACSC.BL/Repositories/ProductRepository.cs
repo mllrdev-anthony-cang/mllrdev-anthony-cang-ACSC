@@ -16,15 +16,14 @@ namespace ACSC.BL
         internal override string TableName => "Product";
         
         public List<Product> GetBy(Product product)
-        {            
-            var result = _connection.Query<Product>(SqlView(product)).ToList();
-            return result;
-            
+        {
+            var generatedSQL = GenerateSQL(product);
+            return base.Get(product, generatedSQL);
         }
 
-        public string SqlView(Product product)
+        public string GenerateSQL(Product product)
         {
-            string sql = $"SELECT TOP 1000 * FROM Product WHERE MarkAs = 'Active'";
+            string sql = $"SELECT TOP 1000 * FROM {TableName} WHERE {nameof(product.MarkAs)} = '{MarkAsOption.Active}'";
             var validlist = ValidateSearchField(product);
 
             if (validlist.Count() < 1)
@@ -38,16 +37,30 @@ namespace ACSC.BL
 
             foreach (var validitem in validlist)
             {
-                if (validlist.IndexOf(validitem) > 0) sql += " AND";
-                if (string.Equals(validitem, "Id"))
+                if (validlist.IndexOf(validitem) > 0)
+                {
+                    sql += " AND";
+                }
+
+                if (string.Equals(validitem, nameof(product.Id)))
                 {
                     sql += $" Id = {product.Id}";
                     break;
                 }
-                if (string.Equals(validitem, nameof(product.Name))) sql += $" Name LIKE '{product.Name}%'";
-                if (string.Equals(validitem, nameof(product.Description))) sql += $" Description LIKE '{product.Description}%'";
-                if (string.Equals(validitem, $"{nameof(product.MinPrice)}{nameof(product.MaxPrice)}")) sql += $" CurrentPrice BETWEEN {product.MinPrice} AND {product.MaxPrice}";
+                else if (string.Equals(validitem, nameof(product.Name)))
+                {
+                    sql += $" {nameof(product.Name)} LIKE '{product.Name}%'";
+                }
+                else if (string.Equals(validitem, nameof(product.Description)))
+                {
+                    sql += $" {nameof(product.Description)} LIKE '{product.Description}%'";
+                }
+                else if (string.Equals(validitem, $"{nameof(product.MinPrice)}{nameof(product.MaxPrice)}"))
+                {
+                    sql += $" {nameof(product.CurrentPrice)} BETWEEN {product.MinPrice} AND {product.MaxPrice}";
+                }
             }
+
             return sql;
         }
 
@@ -55,134 +68,44 @@ namespace ACSC.BL
         {
             var list = new List<string>();
 
-            if (product.Id > 0) list.Add("Id");
-            if (string.IsNullOrWhiteSpace(product.Name) == false) list.Add(nameof(product.Name));
-            if (string.IsNullOrWhiteSpace(product.Description) == false) list.Add(nameof(product.Description));
-            if ((product.MinPrice != null) && (product.MaxPrice != null)) list.Add($"{nameof(product.MinPrice)}{nameof(product.MaxPrice)}");
+            if (product.Id > 0)
+            {
+                list.Add("Id");
+            }
+
+            if (string.IsNullOrWhiteSpace(product.Name) == false)
+            {
+                list.Add(nameof(product.Name));
+            }
+
+            if (string.IsNullOrWhiteSpace(product.Description) == false)
+            {
+                list.Add(nameof(product.Description));
+            }
+
+            if ((product.MinPrice != null) && (product.MaxPrice != null))
+            {
+                list.Add($"{nameof(product.MinPrice)}{nameof(product.MaxPrice)}");
+            }
 
             return list;
         }
 
-        public bool Save(Product product)
+       
+        public new int Save(Product product)
         {
-            bool success = false;
-            string sql;
-
-            if (product.Validate == true)
-            {
-                if (product.Id < 1)
-                {
-                    sql = "INSERT INTO Product" +
-                        "(Name, Description, CurrentPrice, MarkAs) " +
-                        "VALUES" +
-                        "(@Name, @Description, @CurrentPrice, @MarkAs)";
-                }
-                else
-                {
-                    sql = "UPDATE Product SET " +
-                        "Name = @Name, " +
-                        "Description = @Description, " +
-                        "CurrentPrice = @CurrentPrice " +
-                        "WHERE Id = @Id";
-                }
-                
-                var result = _connection.Execute(sql, new
-                {
-                    Id = product.Id,
-                    Name = product.Name,
-                    Description = product.Description,
-                    CurrentPrice = product.CurrentPrice,
-                    MarkAs = "Active"
-                });
-                
-                success = true;
-            }
-            return success;
+            product.MarkAs = $"{MarkAsOption.Active}";
+            return base.Save(product);
         }
 
-        public bool Remove(Product product)
+        public new bool Update(Product product)
         {
-            bool success = false;
-            string sql = "UPDATE Product SET MarkAs = @MarkAs WHERE Id = @Id";
-
-            if (product.Id < 1) return success;
-            
-             var result = _connection.Execute(sql, new
-             {
-                 Id = product.Id,
-                 MarkAs = "Removed"
-             });
-            
-            success = true;
-
-            return success;
+            return base.Update(product);
         }
 
-        public string SearchOperation(Product product)
+        public new bool Delete(int[] id)
         {
-            string message = string.Empty;
-
-            if (string.IsNullOrWhiteSpace(product.AllInString) == true && product.MaxPrice == null && product.MinPrice == null)
-            {
-                return message = "Please enter a value before searching.";
-            }
-
-            var products = GetBy(product);
-
-            if (products.Count < 1)
-            {
-                message = "No records found.";
-            }
-            return message;
+            return base.Delete(id);
         }
-        public string AddOperation(Product product)
-        {
-            string message = string.Empty;
-
-            if (Save(product) == true)
-            {
-                message = "New record added.";
-            }
-            else
-            {
-                message = "Please don't leave the text boxes empty.";
-            }
-
-            return message;
-
-        }
-        public string UpdateOperation(Product oldPropVal, Product newPropVal)
-        {
-            string message = string.Empty;
-
-            if (string.Equals(oldPropVal.AllInString, newPropVal.AllInString) == true)
-            {
-                message = "No changes is made, please check.";
-            }
-            else if (Save(newPropVal) == true)
-            {
-                message = "Record updated.";
-            }
-            else
-            {
-                message = "Please don't leave the text boxes empty.";
-            }
-            return message;
-        }
-        public string DeleteOperation(Product product)
-        {
-            string message = string.Empty;
-
-            if (Remove(product) == true)
-            {
-                message = "Record removed.";
-            }
-            else
-            {
-                message = "Failed! No record passed.";
-            }
-            return message;
-        }
-
     }
 }

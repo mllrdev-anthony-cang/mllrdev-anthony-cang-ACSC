@@ -21,12 +21,12 @@ namespace WindowsFormsACSC
             InitializeComponent();
             _order = order;
             _orderItem.OrderId = order.Id;
-            _generateSummary();            
+            GenerateSummary();            
         }
 
         private Order _order = new Order();
         private OrderItem _orderItem = new OrderItem();
-        private void _generateSummary()
+        private void GenerateSummary()
         {
             listViewSummary.Clear();
             // Set the view to show details.
@@ -71,8 +71,8 @@ namespace WindowsFormsACSC
             labelBillAndShip.Text = $"Customer: {_order.CustomerName}\r\n\r\nPhone Number:{_order.CustomerPhoneNumber}" +
                 $"\r\n\r\nAddress: {_order.ShippingAddress}";
 
-            labelOrderSummary.Text = $"Subtotal ({numberOfitems} items): {Math.Round(Convert.ToDouble(_order.TotalAmount), 2).ToString("0.00")}" +
-                $"\r\n\r\nTotal: {Math.Round(Convert.ToDouble(_order.TotalAmount), 2).ToString("0,000.00")}";
+            labelOrderSummary.Text = $"Subtotal ({numberOfitems} items): {Math.Round(Convert.ToDouble(_order.TotalAmount), 2).ToString("C")}" +
+                $"\r\n\r\nTotal: {Math.Round(Convert.ToDouble(_order.TotalAmount), 2).ToString("C")}";
         }
 
         private void buttonSummaryBack_Click(object sender, EventArgs e)

@@ -20,12 +20,12 @@ namespace WindowsFormsACSC
             InitializeComponent();
             _clearAll();
 
-            dateTimePickerMaxDate.MaxDate = DateTime.Now;
-            dateTimePickerMinDate.MaxDate = DateTime.Now;
+            dateTimePickerMaxDate.MaxDate = dateTimePickerMinDate.MaxDate = DateTime.Now;
+            dateTimePickerMaxDate.Value = dateTimePickerMinDate.Value = DateTime.Now;
         }
 
         private Order _selectedOrder = new Order();
-        private void _fillListView(Order filter)
+        private void FillListView(Order filter)
         {
             listViewOrder.Clear();
             // Set the view to show details.
@@ -84,11 +84,6 @@ namespace WindowsFormsACSC
                 _selectedOrder.ShippingAddress = selectedrow[0].SubItems[7].Text;
             }
 
-
-            //textBoxCustomerName.Text = _selectedOrder.CustomerName;
-            //textBoxShippingAddress.Text = _selectedOrder.ShippingAddress;
-            //textBoxTotalAmount.Text = _selectedOrder.TotalAmount.ToString();
-
             buttonOrderSummary.Enabled = true;
         }
 
@@ -102,7 +97,7 @@ namespace WindowsFormsACSC
                 MaxOrderDate = DateTime.Parse(dateTimePickerMaxDate.Text).Add(day).ToString("yyyy-MM-dd HH:mm:ss.fff"),
                 MinOrderDate = DateTime.Parse(dateTimePickerMinDate.Text).ToString("yyyy-MM-dd HH:mm:ss.fff")
             };
-            _fillListView(order);
+            FillListView(order);
         }
 
         private void _clearAll()
@@ -111,9 +106,8 @@ namespace WindowsFormsACSC
 
             textBoxCustomerName.Text = string.Empty;
             textBoxShippingAddress.Text = string.Empty;
-            //textBoxTotalAmount.Text = string.Empty;
 
-            _fillListView(new Order());
+            FillListView(new Order());
         }
 
         private void buttonClear_Click(object sender, EventArgs e)

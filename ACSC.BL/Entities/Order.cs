@@ -20,19 +20,19 @@ namespace ACSC.BL
         public string CustomerName { get; set; }
         public string CustomerPhoneNumber { get; set; }
         public string ShippingAddress { get; set; }
-        public bool Validate
+        public string MarkAs { get; set; }
+        public bool IsValid
         {
             get
             {
-                bool valid = true;
-
-                if (CustomerId < 1) valid = false;
-                if (AddressId < 1) valid = false;
-                if (OrderDate == null) valid = false;
-                if (Math.Round(Convert.ToDouble(TotalAmount), 2) <= 0) valid = false;
-                //if (OrderItems.Count() < 1) valid = false;
-
-                return valid;
+                bool isValid = true;
+                
+                if (CustomerId < 1 || AddressId < 1 || OrderDate == null || (Math.Round(Convert.ToDouble(TotalAmount), 2) <= 0))
+                {
+                    isValid = false;
+                }
+                    
+                return isValid;
             }
         }
         

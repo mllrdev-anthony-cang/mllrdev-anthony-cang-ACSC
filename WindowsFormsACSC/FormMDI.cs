@@ -51,6 +51,11 @@ namespace WindowsFormsACSC
             newForm.Show();
         }
 
-
+        private void customerOrderHistoryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var newForm = new FormCustomerOrderHistory();
+            newForm.MdiParent = this;
+            newForm.Show();
+        }
     }
 }

@@ -17,15 +17,15 @@ namespace ACSC.BL
 
         public List<OrderItem> GetBy(OrderItem orderitem)
         {
-            var result = _connection.Query<OrderItem>(SqlView(orderitem)).ToList();
-            return result;
-            
+            var generatedSQL = GenerateSQL(orderitem);
+            return base.Get(orderitem, generatedSQL);
+            //return _connection.Query<OrderItem>(generatedSQL).ToList();    
+
         }
 
-        private string SqlView(OrderItem orderitem)
-        {
-            string sql = $"SELECT TOP 1000 * FROM OrderItem WHERE MarkAs = 'Active'";
-            sql = "SELECT TOP 1000 O.OrderId, O.ProductId, O.PurchasePrice, O.Quantity, " +
+        private string GenerateSQL(OrderItem orderitem)
+        {            
+            string sql = "SELECT TOP 1000 O.OrderId, O.ProductId, O.PurchasePrice, O.Quantity, " +
                 "P.Name AS 'OrderItemProductName', P.Description AS 'OrderItemProductDescription' FROM [OrderItem] O " +
                 "INNER JOIN Product P ON P.Id = O.ProductId WHERE O.MarkAs = 'Active'";
             var validlist = ValidateSearchField(orderitem);
@@ -41,79 +41,57 @@ namespace ACSC.BL
 
             foreach (var validitem in validlist)
             {
-                if (validlist.IndexOf(validitem) > 0) sql += " AND";
-                if (string.Equals(validitem, nameof(orderitem.OrderId))) sql += $" O.OrderId = {orderitem.OrderId}";
-                if (string.Equals(validitem, nameof(orderitem.ProductId))) sql += $" O.ProductId = {orderitem.ProductId}";
+                if (validlist.IndexOf(validitem) > 0)
+                {
+                    sql += " AND";
+                }
+
+                if (string.Equals(validitem, nameof(orderitem.OrderId)))
+                {
+                    sql += $" O.OrderId = {orderitem.OrderId}";
+                }
+                else if (string.Equals(validitem, nameof(orderitem.ProductId)))
+                {
+                    sql += $" O.ProductId = {orderitem.ProductId}";
+                }
             }
+
             return sql;
         }
 
 
         private List<string> ValidateSearchField(OrderItem orderitem)
         {
-                var list = new List<string>();
+            var list = new List<string>();
 
-                if (orderitem.OrderId > 0) list.Add(nameof(orderitem.OrderId));
-                if (orderitem.ProductId > 0) list.Add(nameof(orderitem.ProductId));
-
-                return list;
-            
-        }
-
-        public bool Save(OrderItem orderitem)
-        {
-            bool success = false;
-            string sql;
-
-            if (orderitem.Validate == true)
+            if (orderitem.OrderId > 0)
             {
-                var existlist = GetBy(orderitem);
-                if (existlist.Count() < 1)
-                {
-                    sql = "INSERT INTO OrderItem" +
-                        "(OrderId, ProductId, PurchasePrice, Quantity, MarkAs) " +
-                        "VALUES" +
-                        "(@OrderId, @ProductId, @PurchasePrice, @Quantity, @MarkAs)";
-                }
-                else
-                {
-                    sql = "UPDATE OrderItem SET " +
-                        "PurchasePrice = @PurchasePrice, " +
-                        "Quantity = @Quantity " +
-                        "WHERE OrderId = @OrderId AND ProductId = @ProductId";
-                }
-
-                var result = _connection.Execute(sql, new
-                {
-                    OrderId = orderitem.OrderId,
-                    ProductId = orderitem.ProductId,
-                    PurchasePrice = orderitem.PurchasePrice,
-                    Quantity = orderitem.Quantity,
-                    MarkAs = "Active"
-                });
-                
-                success = true;
+                list.Add(nameof(orderitem.OrderId));
             }
-            return success;
+
+            if (orderitem.ProductId > 0)
+            {
+                list.Add(nameof(orderitem.ProductId));
+            }
+
+            return list;
+            
         }
 
-        public bool Remove(OrderItem orderitem)
+        public new int Save(OrderItem orderitem)
         {
-            bool success = false;
-            string sql = "UPDATE OrderItem SET MarkAs = @MarkAs WHERE OrderId = @OrderId AND ProductId = @ProductId";
+            orderitem.MarkAs = $"{MarkAsOption.Active}";
+            return base.Save(orderitem);
+        }
 
-            if (orderitem.OrderId < 1 || orderitem.ProductId < 1) return success;
+        bool IRepository<OrderItem>.Update(OrderItem obj)
+        {
+            throw new NotImplementedException();
+        }
 
-            var result = _connection.Execute(sql, new
-             {
-                 OrderId = orderitem.OrderId,
-                 ProductId = orderitem.ProductId,
-                 MarkAs = "Removed"
-             });
-            
-            success = true;
-
-            return success;
+        bool IRepository<OrderItem>.Delete(int[] id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

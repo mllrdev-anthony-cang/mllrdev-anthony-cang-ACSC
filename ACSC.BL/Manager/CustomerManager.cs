@@ -12,39 +12,23 @@ namespace ACSC.BL.Manager
     {
         public override IRepository<Customer> Repository => new CustomerRepository();
 
-        public string AddOperation(Customer obj)
-        {
-            return ((ICustomerRepository)Repository).AddOperation(obj);
-        }
-
-        public string DeleteOperation(Customer obj)
-        {
-            return ((ICustomerRepository)Repository).DeleteOperation(obj);
-        }
-
         public List<Customer> GetBy(Customer obj)
         {
             return ((ICustomerRepository)Repository).GetBy(obj);
         }
-
-        public bool Remove(Customer obj)
+        public new int Save(Customer obj)
         {
-            return ((ICustomerRepository)Repository).Remove(obj);
+            return Repository.Save(obj);
         }
 
-        public bool Save(Customer obj)
+        public new bool Update(Customer obj)
         {
-            return ((ICustomerRepository)Repository).Save(obj);
+            return Repository.Update(obj);
         }
 
-        public string SearchOperation(Customer obj)
+        public new bool Delete(int[] id)
         {
-            return ((ICustomerRepository)Repository).SearchOperation(obj);
-        }
-
-        public string UpdateOperation(Customer obj1, Customer obj2)
-        {
-            return ((ICustomerRepository)Repository).UpdateOperation(obj1,obj2);
+            return Repository.Delete(id);
         }
     }
 }
