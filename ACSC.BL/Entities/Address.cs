@@ -15,22 +15,21 @@ namespace ACSC.BL
         public string Barangay { get; set; }
         public int CustomerId { get; set; }
         public string MarkAs { get; set; }
-        public bool IsValid
+        /*public bool IsValid
         {
             get
             {
                 bool isValid = true;
 
-                if (string.IsNullOrWhiteSpace(HouseBuildingStreet) || string.IsNullOrWhiteSpace(Province) 
+                if (string.IsNullOrWhiteSpace(HouseBuildingStreet) || string.IsNullOrWhiteSpace(Province)
                     || string.IsNullOrWhiteSpace(CityMunicipality) || string.IsNullOrWhiteSpace(Barangay) || CustomerId < 1)
                 {
                     isValid = false;
-                }                        
+                }
 
                 return isValid;
             }
         }
-
         public string FullAddress
         {
             get
@@ -38,14 +37,13 @@ namespace ACSC.BL
                 return $"{HouseBuildingStreet}, {Barangay}, {CityMunicipality}, {Province}";
             }
         }
-
         public string AllInString
         {
             get
             {
-                return $"{HouseBuildingStreet}{Province}{CityMunicipality}{Barangay}";                
+                return $"{HouseBuildingStreet}{Province}{CityMunicipality}{Barangay}";
             }
-        }
-        
+        }*/
+
     }
 }

@@ -55,6 +55,7 @@
     <Compile Include="Manager\Interface\IAddressManager.cs" />
     <Compile Include="Manager\Interface\ICustomerManager.cs" />
     <Compile Include="Manager\Interface\ICustomerOrderHistoryManager.cs" />
+    <Compile Include="Models\AddressMethods.cs" />
     <Compile Include="Repositories\Interface\ICustomerOrderHistoryRepository.cs" />
     <Compile Include="Manager\Interface\IManager.cs" />
     <Compile Include="Manager\Interface\IOrderItemManager.cs" />

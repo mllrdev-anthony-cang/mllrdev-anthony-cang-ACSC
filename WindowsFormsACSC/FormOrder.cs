@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using ACSC.BL;
 using ACSC.BL.Manager;
 using ACSC.BL.Manager.Interface;
+using ACSC.BL.Models;
 using ACSC.BL.Repositories.Interface;
 
 namespace WindowsFormsACSC
@@ -38,6 +39,7 @@ namespace WindowsFormsACSC
         private ICustomerManager _customerManager = new CustomerManager();
         private Address _selectedAddress = new Address(), _getAddresses = new Address();
         IAddressManager _addressManager = new AddressManager();
+        private AddressMethods _addressMethods = new AddressMethods();
 
         private void FillListView(List<Product> products)
         {
@@ -303,7 +305,7 @@ namespace WindowsFormsACSC
         }                
         private bool IsMatch(Address address, IAddressManager db)
         {
-            if (string.IsNullOrWhiteSpace(address.AllInString) == true)
+            if (string.IsNullOrWhiteSpace(_addressMethods.AllInString(address)) == true)
             {
                 MessageBox.Show("Please enter a value before searching.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
@@ -658,7 +660,7 @@ namespace WindowsFormsACSC
             textBoxAddressProvince.Text = _selectedAddress.Province;
             textBoxAddressCity.Text = _selectedAddress.CityMunicipality;
             textBoxAddressBarangay.Text = _selectedAddress.Barangay;*/
-            labelAddress.Text = _selectedAddress.FullAddress;
+            labelAddress.Text = _addressMethods.FullAddress(_selectedAddress);
 
             buttonAddressNext.Enabled = true;
             buttonAddressReset.Enabled = true;

@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ACSC.BL.Models;
 using ACSC.BL.Repositories;
 using ACSC.BL.Repositories.Interface;
 using Dapper;

@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using ACSC.BL;
 using ACSC.BL.Manager;
 using ACSC.BL.Manager.Interface;
+using ACSC.BL.Models;
 using ACSC.BL.Repositories.Interface;
 
 namespace WindowsFormsACSC
@@ -18,11 +19,13 @@ namespace WindowsFormsACSC
     {
         private IAddressManager _manager;
         private Address _address,_selectedAddress;
+        private AddressMethods _addressMethods;
         public FormAddress(Customer customer)
         {
             InitializeComponent();
             _manager = new AddressManager();
             _address = _selectedAddress = new Address { CustomerId = customer.Id };
+            _addressMethods = new AddressMethods();
             FillListView(_manager.GetBy(_address));
             this.Text = $"{customer.FullName} Address List";
             InitialFormState();
@@ -98,7 +101,7 @@ namespace WindowsFormsACSC
                 _selectedAddress.Barangay = selectedrow[0].SubItems[4].Text;
             }
 
-            labelAddress.Text = _selectedAddress.FullAddress;
+            labelAddress.Text = _addressMethods.FullAddress(_selectedAddress);
             buttonDelete.Enabled = true;
             buttonAdd.Text = "Add";
             buttonReset.Enabled = true;
@@ -115,7 +118,7 @@ namespace WindowsFormsACSC
                 CustomerId = _selectedAddress.CustomerId
             };
 
-            if (string.IsNullOrWhiteSpace(address.AllInString) == true)
+            if (string.IsNullOrWhiteSpace(_addressMethods.AllInString(address)) == true)
             {
                 MessageBox.Show("Please enter a value before searching.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -158,7 +161,7 @@ namespace WindowsFormsACSC
                 CustomerId = _selectedAddress.CustomerId
             };
 
-            if (address.IsValid == true)
+            if (_addressMethods.IsValid(address) == true)
             {
                 address.Id = _manager.Save(address);
             }
@@ -203,11 +206,11 @@ namespace WindowsFormsACSC
             string updateMessage = "";//_iAddressRepository.UpdateOperation(_addressSelection, address);
             bool success = false;
 
-            if(string.Equals(_selectedAddress.AllInString, address.AllInString) == true)
+            if(string.Equals(_addressMethods.AllInString(_selectedAddress), _addressMethods.AllInString(address)) == true)
             {
                 updateMessage = "No Changes made, please check.";
             }
-            else if (address.IsValid == true)
+            else if (_addressMethods.IsValid(address) == true)
             {
                 success = _manager.Update(address);
                 updateMessage = "Record Updated.";
