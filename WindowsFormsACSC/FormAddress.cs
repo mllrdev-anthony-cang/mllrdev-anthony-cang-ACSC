@@ -26,9 +26,9 @@ namespace WindowsFormsACSC
             _manager = new AddressManager();
             _address = _selectedAddress = new Address { CustomerId = customer.Id };
             _addressMethods = new AddressMethods();
-            FillListView(_manager.GetBy(_address));
-            this.Text = $"{customer.FullName} Address List";
-            InitialFormState();
+            FillListView(_manager.Search(_address));
+            //this.Text = $"{customer.FullName} Address List";
+            InitialFormState();            
         }       
         
         private void FillListView(List<Address> addresses)
@@ -124,7 +124,7 @@ namespace WindowsFormsACSC
                 return;
             }
 
-            var getBy = _manager.GetBy(address);
+            var getBy = _manager.Search(address);
 
             if (getBy.Count < 1)
             {
@@ -169,7 +169,7 @@ namespace WindowsFormsACSC
             if (address.Id > 0)
             {
                 InitialFormState();
-                FillListView(_manager.GetBy(address));
+                FillListView(_manager.Search(address));
                 buttonReset.Enabled = true;
                 MessageBox.Show($"New record with ID '{address.Id}' added.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -223,7 +223,7 @@ namespace WindowsFormsACSC
             if (success)
             {
                 InitialFormState();
-                FillListView(_manager.GetBy(address));
+                FillListView(_manager.Search(address));
                 buttonReset.Enabled = true;
                 MessageBox.Show(updateMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -248,7 +248,7 @@ namespace WindowsFormsACSC
                 if (_manager.Delete(ids.ToArray()))
                 {
                     InitialFormState();
-                    FillListView(_manager.GetBy(_address));
+                    FillListView(_manager.Search(_address));
                     MessageBox.Show("Record removed.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
@@ -260,7 +260,7 @@ namespace WindowsFormsACSC
         private void buttonReset_Click(object sender, EventArgs e)
         {
             InitialFormState();
-            FillListView(_manager.GetBy(_address));
+            FillListView(_manager.Search(_address));
         }
         private void FormAddress_FormClosing(object sender, FormClosingEventArgs e)
         {

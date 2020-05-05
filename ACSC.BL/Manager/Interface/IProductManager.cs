@@ -8,6 +8,6 @@ namespace ACSC.BL.Manager.Interface
 {
     public interface IProductManager: IManager<Product>
     {
-        List<Product> GetBy(Product obj);
+        List<Product> Search(Product obj);
     }
 }

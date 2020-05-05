@@ -10,22 +10,22 @@ using ACSC.BL.Repositories.Interface;
 
 namespace ACSC.BL.Manager
 {
-    public class CustomerOrderHistoryManager: BaseManager<CustomerOrderHistory>, ICustomerOrderHistoryManager
+    public class CustomerOrderHistoryManager: BaseManager<CustomerProductOrderHistory>, ICustomerOrderHistoryManager
     {
-        public override IRepository<CustomerOrderHistory> Repository => new CustomerOrderHistoryRepository();
+        public override IRepository<CustomerProductOrderHistory> Repository => new CustomerOrderHistoryRepository();
 
-        public List<CustomerOrderHistory> GetBy(CustomerOrderHistory obj)
+        public List<CustomerProductOrderHistory> Search(CustomerProductOrderHistory obj)
         {
             //throw new NotImplementedException();
-            return ((ICustomerOrderHistoryRepository)Repository).GetBy(obj);
+            return ((ICustomerOrderHistoryRepository)Repository).Search(obj);
         }
 
-        public new int Save(CustomerOrderHistory obj)
+        public new int Save(CustomerProductOrderHistory obj)
         {
             throw new NotImplementedException();
         }
 
-        public new bool Update(CustomerOrderHistory obj)
+        public new bool Update(CustomerProductOrderHistory obj)
         {
             throw new NotImplementedException();
         }

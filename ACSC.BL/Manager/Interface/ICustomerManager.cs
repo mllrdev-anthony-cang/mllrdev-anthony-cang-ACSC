@@ -8,6 +8,6 @@ namespace ACSC.BL.Manager.Interface
 {
     public interface ICustomerManager: IManager<Customer>
     {
-        List<Customer> GetBy(Customer obj);
+        List<Customer> Search(Customer obj);
     }
 }

@@ -16,18 +16,18 @@ namespace WindowsFormsACSC
     public partial class FormCustomerOrderHistory : Form
     {
         private ICustomerOrderHistoryManager _manager;
-        private CustomerOrderHistory _customerOrderHistory;
+        private CustomerProductOrderHistory _customerOrderHistory;
         public FormCustomerOrderHistory()
         {
             InitializeComponent();
 
             _manager = new CustomerOrderHistoryManager();
-            _customerOrderHistory = new CustomerOrderHistory();
+            _customerOrderHistory = new CustomerProductOrderHistory();
             dateTimePickerMaxDate.MaxDate = dateTimePickerMinDate.MaxDate = DateTime.Now;
             dateTimePickerMaxDate.Value = dateTimePickerMinDate.Value = DateTime.Now;
         }
 
-        private void FillListView(List<CustomerOrderHistory> customerOrderHistories)
+        private void FillListView(List<CustomerProductOrderHistory> customerOrderHistories)
         {
             listViewOrder.Items.Clear();           
             var listItem = new List<ListViewItem>();
@@ -59,7 +59,7 @@ namespace WindowsFormsACSC
             _customerOrderHistory.CustomerId = customerId;
             _customerOrderHistory.MaxOrderDate = DateTime.Parse(dateTimePickerMaxDate.Text).Add(day).ToString("yyyy-MM-dd HH:mm:ss.fff");
             _customerOrderHistory.MinOrderDate = DateTime.Parse(dateTimePickerMinDate.Text).ToString("yyyy-MM-dd HH:mm:ss.fff");
-            var result = _manager.GetBy(_customerOrderHistory);
+            var result = _manager.Search(_customerOrderHistory);
             FillListView(result);
 
             var totalItems = result.Sum(s => s.Quantity);

@@ -11,16 +11,16 @@ namespace ACSC.BL
         public int Id { get; set; }
         public int CustomerId { get; set; }
         public int AddressId { get; set; }
-        public DateTime? OrderDate { get; set; }
-        public decimal? TotalAmount { get; set; }
-        public List<OrderItem> OrderItems { get; set; }
+        public DateTime OrderDate { get; set; }
+        public decimal TotalAmount { get; set; }
+        public string MarkAs { get; set; }
+        /*public List<OrderItem> OrderItems { get; set; }
         public string MinOrderDate { get; set; }
         public string MaxOrderDate { get; set; }
-
         public string CustomerName { get; set; }
         public string CustomerPhoneNumber { get; set; }
         public string ShippingAddress { get; set; }
-        public string MarkAs { get; set; }
+        
         public bool IsValid
         {
             get
@@ -34,7 +34,7 @@ namespace ACSC.BL
                     
                 return isValid;
             }
-        }
-        
+        }*/
+
     }
 }

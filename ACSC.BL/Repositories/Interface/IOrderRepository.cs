@@ -8,6 +8,6 @@ namespace ACSC.BL.Repositories.Interface
 {
     public interface IOrderRepository: IRepository<Order>
     {
-        List<Order> GetBy(Order obj);
+        List<Order> Search(Order obj);
     }
 }

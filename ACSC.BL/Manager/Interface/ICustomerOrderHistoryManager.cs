@@ -7,8 +7,8 @@ using ACSC.BL.Models;
 
 namespace ACSC.BL.Manager.Interface
 {
-    public interface ICustomerOrderHistoryManager: IManager<CustomerOrderHistory>
+    public interface ICustomerOrderHistoryManager: IManager<CustomerProductOrderHistory>
     {
-        List<CustomerOrderHistory> GetBy(CustomerOrderHistory obj);
+        List<CustomerProductOrderHistory> Search(CustomerProductOrderHistory obj);
     }
 }

@@ -15,7 +15,7 @@ namespace ACSC.BL
     {
         internal override string TableName => "[Order]";
 
-        public List<Order> GetBy(Order order)
+        public List<Order> Search(Order order)
         {
             var generatedSQL = GenerateSQL(order);
             return base.Get(order, generatedSQL);
@@ -60,7 +60,7 @@ namespace ACSC.BL
                 {
                     sql += $" O.AddressId = {order.AddressId}";
                 }
-                else if (string.Equals(validitem, $"{nameof(order.MinOrderDate)}{nameof(order.MaxOrderDate)}"))
+                /*else if (string.Equals(validitem, $"{nameof(order.MinOrderDate)}{nameof(order.MaxOrderDate)}"))
                 {
                     sql += $" O.OrderDate BETWEEN '{order.MinOrderDate}' AND '{order.MaxOrderDate}'";
                 }
@@ -75,7 +75,7 @@ namespace ACSC.BL
                 else if (string.Equals(validitem, nameof(order.ShippingAddress)))
                 {
                     sql += $" CONCAT(A.HouseBuildingStreet,', ',A.Barangay,', ',A.CityMunicipality,', ',A.Province) LIKE '%{order.ShippingAddress}%'";
-                }
+                }*/
             }
 
             return sql;
@@ -100,7 +100,7 @@ namespace ACSC.BL
                 list.Add(nameof(order.AddressId));
             }
 
-            if (string.IsNullOrWhiteSpace(order.MinOrderDate) == false && string.IsNullOrWhiteSpace(order.MaxOrderDate) == false)
+            /*if (string.IsNullOrWhiteSpace(order.MinOrderDate) == false && string.IsNullOrWhiteSpace(order.MaxOrderDate) == false)
             {
                 list.Add($"{nameof(order.MinOrderDate)}{nameof(order.MaxOrderDate)}");
             }
@@ -118,7 +118,7 @@ namespace ACSC.BL
             if (string.IsNullOrEmpty(order.ShippingAddress) == false)
             {
                 list.Add(nameof(order.ShippingAddress));
-            }
+            }*/
 
             return list;
         }

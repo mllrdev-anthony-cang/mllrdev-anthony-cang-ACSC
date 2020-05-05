@@ -51,7 +51,7 @@ namespace WindowsFormsACSC
             //var db = new OrderRepository();
             IOrderManager db = new OrderManager();
             var productList = new List<ListViewItem>();
-            var orders = db.GetBy(filter);
+            var orders = db.Search(filter);
 
             foreach (var order in orders)
             {
@@ -60,9 +60,9 @@ namespace WindowsFormsACSC
                 item.SubItems.Add(order.CustomerId.ToString());
                 item.SubItems.Add(order.TotalAmount.ToString());
                 item.SubItems.Add(order.OrderDate.ToString());
-                item.SubItems.Add(order.CustomerName.ToString());
-                item.SubItems.Add(order.CustomerPhoneNumber.ToString());
-                item.SubItems.Add(order.ShippingAddress.ToString());
+                //item.SubItems.Add(order.CustomerName.ToString());
+                //item.SubItems.Add(order.CustomerPhoneNumber.ToString());
+                //item.SubItems.Add(order.ShippingAddress.ToString());
 
                 productList.Add(item);
             }
@@ -79,9 +79,9 @@ namespace WindowsFormsACSC
                 _selectedOrder.AddressId = Convert.ToInt32(selectedrow[0].SubItems[1].Text);
                 _selectedOrder.CustomerId = Convert.ToInt32(selectedrow[0].SubItems[2].Text);
                 _selectedOrder.TotalAmount = Convert.ToDecimal(selectedrow[0].SubItems[3].Text);
-                _selectedOrder.CustomerName = selectedrow[0].SubItems[5].Text;
-                _selectedOrder.CustomerPhoneNumber = selectedrow[0].SubItems[6].Text;
-                _selectedOrder.ShippingAddress = selectedrow[0].SubItems[7].Text;
+                //_selectedOrder.CustomerName = selectedrow[0].SubItems[5].Text;
+                //_selectedOrder.CustomerPhoneNumber = selectedrow[0].SubItems[6].Text;
+                //_selectedOrder.ShippingAddress = selectedrow[0].SubItems[7].Text;
             }
 
             buttonOrderSummary.Enabled = true;
@@ -92,10 +92,10 @@ namespace WindowsFormsACSC
             var day = new TimeSpan(0,23,59,0,0);
             var order = new Order
             {
-                CustomerName = textBoxCustomerName.Text.Trim(),
-                ShippingAddress = textBoxShippingAddress.Text.Trim(),
-                MaxOrderDate = DateTime.Parse(dateTimePickerMaxDate.Text).Add(day).ToString("yyyy-MM-dd HH:mm:ss.fff"),
-                MinOrderDate = DateTime.Parse(dateTimePickerMinDate.Text).ToString("yyyy-MM-dd HH:mm:ss.fff")
+                //CustomerName = textBoxCustomerName.Text.Trim(),
+                //ShippingAddress = textBoxShippingAddress.Text.Trim(),
+                //MaxOrderDate = DateTime.Parse(dateTimePickerMaxDate.Text).Add(day).ToString("yyyy-MM-dd HH:mm:ss.fff"),
+                //MinOrderDate = DateTime.Parse(dateTimePickerMinDate.Text).ToString("yyyy-MM-dd HH:mm:ss.fff")
             };
             FillListView(order);
         }

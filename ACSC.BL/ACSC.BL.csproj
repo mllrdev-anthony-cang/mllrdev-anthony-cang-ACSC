@@ -55,7 +55,8 @@
     <Compile Include="Manager\Interface\IAddressManager.cs" />
     <Compile Include="Manager\Interface\ICustomerManager.cs" />
     <Compile Include="Manager\Interface\ICustomerOrderHistoryManager.cs" />
-    <Compile Include="Models\AddressMethods.cs" />
+    <Compile Include="Entities\Methods\AddressMethods.cs" />
+    <Compile Include="Models\CustomerProduct.cs" />
     <Compile Include="Repositories\Interface\ICustomerOrderHistoryRepository.cs" />
     <Compile Include="Manager\Interface\IManager.cs" />
     <Compile Include="Manager\Interface\IOrderItemManager.cs" />
@@ -65,7 +66,7 @@
     <Compile Include="Manager\OrderManager.cs" />
     <Compile Include="Manager\ProductManager.cs" />
     <Compile Include="Entities\Address.cs" />
-    <Compile Include="Models\CustomerOrderHistory.cs" />
+    <Compile Include="Models\CustomerProductOrderHistory.cs" />
     <Compile Include="Repositories\AddressRepository.cs" />
     <Compile Include="Entities\Customer.cs" />
     <Compile Include="Repositories\BaseRepository.cs" />

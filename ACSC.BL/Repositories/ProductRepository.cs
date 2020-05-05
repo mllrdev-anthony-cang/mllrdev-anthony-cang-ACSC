@@ -15,7 +15,7 @@ namespace ACSC.BL
     {
         internal override string TableName => "Product";
         
-        public List<Product> GetBy(Product product)
+        public List<Product> Search(Product product)
         {
             var generatedSQL = GenerateSQL(product);
             return base.Get(product, generatedSQL);
@@ -55,10 +55,10 @@ namespace ACSC.BL
                 {
                     sql += $" {nameof(product.Description)} LIKE '{product.Description}%'";
                 }
-                else if (string.Equals(validitem, $"{nameof(product.MinPrice)}{nameof(product.MaxPrice)}"))
+                /*else if (string.Equals(validitem, $"{nameof(product.MinPrice)}{nameof(product.MaxPrice)}"))
                 {
                     sql += $" {nameof(product.CurrentPrice)} BETWEEN {product.MinPrice} AND {product.MaxPrice}";
-                }
+                }*/
             }
 
             return sql;
@@ -83,10 +83,10 @@ namespace ACSC.BL
                 list.Add(nameof(product.Description));
             }
 
-            if ((product.MinPrice != null) && (product.MaxPrice != null))
+            /*if ((product.MinPrice != null) && (product.MaxPrice != null))
             {
                 list.Add($"{nameof(product.MinPrice)}{nameof(product.MaxPrice)}");
-            }
+            }*/
 
             return list;
         }

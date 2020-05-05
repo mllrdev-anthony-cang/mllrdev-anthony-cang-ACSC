@@ -8,6 +8,6 @@ namespace ACSC.BL.Repositories.Interface
 {
     public interface IAddressRepository: IRepository<Address>
     {
-        List<Address> GetBy(Address obj);
+        List<Address> Search(Address obj);
     }
 }

@@ -9,17 +9,17 @@ using ACSC.BL.Repositories.Interface;
 
 namespace ACSC.BL.Repositories
 {
-    internal class CustomerOrderHistoryRepository: BaseRepository<CustomerOrderHistory> , ICustomerOrderHistoryRepository
+    internal class CustomerOrderHistoryRepository: BaseRepository<CustomerProductOrderHistory> , ICustomerOrderHistoryRepository
     {
         internal override string TableName => "[OrderItem]";
 
-        public List<CustomerOrderHistory> GetBy(CustomerOrderHistory obj)
+        public List<CustomerProductOrderHistory> Search(CustomerProductOrderHistory obj)
         {
             var generatedSQL = GenerateSQL(obj);
             return base.Get(obj, generatedSQL);
         }     
 
-        private string GenerateSQL(CustomerOrderHistory obj)
+        private string GenerateSQL(CustomerProductOrderHistory obj)
         {
             string sql = $"SELECT TOP 1000 " +
                 $"O.ProductId, X.CustomerId, P.Name AS 'ProductName', O.PurchasePrice, O.Quantity, X.OrderDate, CONCAT(C.FirstName, ' ', C.LastName) AS 'CustomerName' " +
@@ -62,7 +62,7 @@ namespace ACSC.BL.Repositories
 
             return sql;
         }
-        private List<string> ValidateSearchField(CustomerOrderHistory obj)
+        private List<string> ValidateSearchField(CustomerProductOrderHistory obj)
         {
             var list = new List<string>();
 
@@ -83,15 +83,15 @@ namespace ACSC.BL.Repositories
 
             return list;
         }
-        int IRepository<CustomerOrderHistory>.Save(CustomerOrderHistory obj)
+        int IRepository<CustomerProductOrderHistory>.Save(CustomerProductOrderHistory obj)
         {
             throw new NotImplementedException();
         }
-        bool IRepository<CustomerOrderHistory>.Update(CustomerOrderHistory obj)
+        bool IRepository<CustomerProductOrderHistory>.Update(CustomerProductOrderHistory obj)
         {
             throw new NotImplementedException();
         }        
-        bool IRepository<CustomerOrderHistory>.Delete(int[] id)
+        bool IRepository<CustomerProductOrderHistory>.Delete(int[] id)
         {
             throw new NotImplementedException();
         }

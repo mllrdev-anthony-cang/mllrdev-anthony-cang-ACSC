@@ -10,10 +10,10 @@ namespace ACSC.BL
     {
         public int OrderId { get; set; }
         public int ProductId { get; set; }
-        public decimal? Quantity { get; set; }
-        public decimal? PurchasePrice { get; set; }
+        public decimal Quantity { get; set; }
+        public decimal PurchasePrice { get; set; }
         public string MarkAs { get; set; }
-        public string OrderItemProductName { get; set; }
+        /*public string OrderItemProductName { get; set; }
         public string OrderItemProductDescription { get; set; }
         
         public bool IsValid
@@ -29,7 +29,7 @@ namespace ACSC.BL
 
                 return isValid;
             }
-        }
+        }*/
 
     }
 }

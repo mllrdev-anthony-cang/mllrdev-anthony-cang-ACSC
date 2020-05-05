@@ -11,11 +11,10 @@ namespace ACSC.BL
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public decimal? CurrentPrice { get; set; }
-        public decimal? MinPrice { get; set; }
-        public decimal? MaxPrice { get; set; }
+        public decimal CurrentPrice { get; set; }        
         public string MarkAs { get; set; }
-
+        /*public decimal? MinPrice { get; set; }
+        public decimal? MaxPrice { get; set; }
         public bool IsValid
         {
             get
@@ -40,7 +39,7 @@ namespace ACSC.BL
             {
                 return $"{Name}{Description}{CurrentPrice}";
             }
-        }        
+        }*/        
         
     }
 }

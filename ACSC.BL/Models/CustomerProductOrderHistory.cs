@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ACSC.BL.Models
 {
-    public class CustomerOrderHistory
+    public class CustomerProductOrderHistory
     {        
         public int CustomerId { get; set; }
         public int ProductId { get; set; }

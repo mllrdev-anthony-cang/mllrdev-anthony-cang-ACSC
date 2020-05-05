@@ -23,7 +23,7 @@ namespace WindowsFormsACSC
             InitializeComponent();
             _manager = new ProductManager();
             _product = _selectedProduct = new Product();
-            FillListView(_manager.GetBy(_product));
+            FillListView(_manager.Search(_product));
             InitialFormState();
         }        
         private void FillListView(List<Product> products)
@@ -109,24 +109,24 @@ namespace WindowsFormsACSC
             {
                 Name = textBoxName.Text.Trim(),
                 Description = textBoxDescription.Text.Trim(),
-                MaxPrice = decimal.TryParse(textBoxMaxPrice.Text.Trim(), out maxPrice) ? maxPrice : maxPrice,
-                MinPrice = decimal.TryParse(textBoxMinPrice.Text.Trim(), out minPrice) ? minPrice : minPrice
+                //MaxPrice = decimal.TryParse(textBoxMaxPrice.Text.Trim(), out maxPrice) ? maxPrice : maxPrice,
+                //MinPrice = decimal.TryParse(textBoxMinPrice.Text.Trim(), out minPrice) ? minPrice : minPrice
             };
 
-            if (product.MaxPrice == 0 && product.MinPrice == 0)
+            /*if (product.MaxPrice == 0 && product.MinPrice == 0)
             {
                 product.MaxPrice = null;
                 product.MinPrice = null;
-            }
+            }*/
 
 
-            if (string.IsNullOrWhiteSpace(product.AllInString) == true)
+            /*if (string.IsNullOrWhiteSpace(product.AllInString) == true)
             {
                 MessageBox.Show("Please enter a value before searching.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
-            }
+            }*/
 
-            var getBy = _manager.GetBy(product);
+            var getBy = _manager.Search(product);
 
             if (getBy.Count < 1)
             {
@@ -135,12 +135,12 @@ namespace WindowsFormsACSC
             else
             {
                 InitialFormState();
-                FillListView(_manager.GetBy(product));
+                FillListView(_manager.Search(product));
                 buttonReset.Enabled = true;
                 textBoxName.Text = product.Name;
                 textBoxDescription.Text = product.Description;
-                textBoxMaxPrice.Text = product.MaxPrice.ToString();
-                textBoxMinPrice.Text = product.MinPrice.ToString();
+                //textBoxMaxPrice.Text = product.MaxPrice.ToString();
+                //textBoxMinPrice.Text = product.MinPrice.ToString();
             }
         }        
         private void buttonAdd_Click(object sender, EventArgs e)
@@ -168,15 +168,15 @@ namespace WindowsFormsACSC
             };
 
             //var addMessage = _iProductRepository.AddOperation(product);
-            if (product.IsValid == true)
+            /*if (product.IsValid == true)
             {
                 product.Id = _manager.Save(product);
-            }
+            }*/
 
             if (product.Id > 0)
             {
                 InitialFormState();
-                FillListView(_manager.GetBy(product));
+                FillListView(_manager.Search(product));
                 buttonReset.Enabled = true;
                 MessageBox.Show($"New record with ID '{product.Id}' added.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -218,7 +218,7 @@ namespace WindowsFormsACSC
             string updateMessage;
             bool success = false;
 
-            if (string.Equals(_selectedProduct.AllInString, productNewProp.AllInString) == true)
+            /*if (string.Equals(_selectedProduct.AllInString, productNewProp.AllInString) == true)
             {
                 updateMessage = "No Changes made, please check.";
             }
@@ -230,18 +230,18 @@ namespace WindowsFormsACSC
             else
             {
                 updateMessage = "Please don't leave the text boxes empty.";
-            }
+            }*/
 
             if (success)
             {
                 InitialFormState();
-                FillListView(_manager.GetBy(productNewProp));
+                FillListView(_manager.Search(productNewProp));
                 buttonReset.Enabled = true;
-                MessageBox.Show(updateMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                //MessageBox.Show(updateMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
             {
-                MessageBox.Show(updateMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //MessageBox.Show(updateMessage, "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void buttonDelete_Click(object sender, EventArgs e)
@@ -260,7 +260,7 @@ namespace WindowsFormsACSC
                 if (_manager.Delete(ids.ToArray()))
                 {
                     InitialFormState();
-                    FillListView(_manager.GetBy(_product));
+                    FillListView(_manager.Search(_product));
                     MessageBox.Show("Records removed!", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
@@ -276,7 +276,7 @@ namespace WindowsFormsACSC
         private void buttonReset_Click(object sender, EventArgs e)
         {
             InitialFormState();
-            FillListView(_manager.GetBy(_product));
+            FillListView(_manager.Search(_product));
         }
         private void FormProduct_FormClosing(object sender, FormClosingEventArgs e)
         {

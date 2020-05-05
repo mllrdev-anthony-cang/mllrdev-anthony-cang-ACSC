@@ -8,6 +8,6 @@ namespace ACSC.BL.Repositories.Interface
 {
     public interface IProductRepository: IRepository<Product>
     {
-        List<Product> GetBy(Product product);
+        List<Product> Search(Product product);
     }
 }

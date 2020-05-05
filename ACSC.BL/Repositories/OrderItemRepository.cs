@@ -15,7 +15,7 @@ namespace ACSC.BL
     {
         internal override string TableName => "[OrderItem]";
 
-        public List<OrderItem> GetBy(OrderItem orderitem)
+        public List<OrderItem> Search(OrderItem orderitem)
         {
             var generatedSQL = GenerateSQL(orderitem);
             return base.Get(orderitem, generatedSQL);

@@ -8,6 +8,6 @@ namespace ACSC.BL.Manager.Interface
 {
     public interface IOrderManager : IManager<Order>
     {
-        List<Order> GetBy(Order obj);
+        List<Order> Search(Order obj);
     }
 }

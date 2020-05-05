@@ -50,15 +50,15 @@ namespace WindowsFormsACSC
             //IOrderItemRepository<OrderItem> db = new OrderItemRepository();
             IOrderItemManager db = new OrderItemManager();
             var orderItemList = new List<ListViewItem>();
-            var orders = db.GetBy(_orderItem);
+            var orders = db.Search(_orderItem);
             decimal? numberOfitems = 0;
             
             foreach (var order in orders)
             {
                 ListViewItem item = new ListViewItem(order.OrderId.ToString());
                 item.SubItems.Add(order.ProductId.ToString());
-                item.SubItems.Add(order.OrderItemProductName.ToString());
-                item.SubItems.Add(order.OrderItemProductDescription.ToString());
+                //item.SubItems.Add(order.OrderItemProductName.ToString());
+                //item.SubItems.Add(order.OrderItemProductDescription.ToString());
                 item.SubItems.Add(order.PurchasePrice.ToString());
                 item.SubItems.Add(order.Quantity.ToString());
 
@@ -68,8 +68,7 @@ namespace WindowsFormsACSC
             }
             listViewSummary.Items.AddRange(orderItemList.ToArray());
 
-            labelBillAndShip.Text = $"Customer: {_order.CustomerName}\r\n\r\nPhone Number:{_order.CustomerPhoneNumber}" +
-                $"\r\n\r\nAddress: {_order.ShippingAddress}";
+            //labelBillAndShip.Text = $"Customer: {_order.CustomerName}\r\n\r\nPhone Number:{_order.CustomerPhoneNumber}\r\n\r\nAddress: {_order.ShippingAddress}";
 
             labelOrderSummary.Text = $"Subtotal ({numberOfitems} items): {Math.Round(Convert.ToDouble(_order.TotalAmount), 2).ToString("C")}" +
                 $"\r\n\r\nTotal: {Math.Round(Convert.ToDouble(_order.TotalAmount), 2).ToString("C")}";

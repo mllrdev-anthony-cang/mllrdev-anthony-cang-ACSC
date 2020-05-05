@@ -13,8 +13,7 @@ namespace ACSC.BL
         public string PhoneNumber { get; set; }
         public int Id { get; set; }
         public string MarkAs { get; set; }
-
-        public bool IsValid
+        /*public bool IsValid
         {
             get
             {            
@@ -28,7 +27,6 @@ namespace ACSC.BL
                 return isValid;
             }
         }
-
         public string FullName
         {
             get
@@ -37,7 +35,6 @@ namespace ACSC.BL
                 return fullname;
             }            
         }
-
         public string AllInString
         {
             get
@@ -45,7 +42,7 @@ namespace ACSC.BL
                 string customer = $"{FirstName}{LastName}{PhoneNumber}";
                 return customer;
             }
-        }
+        }*/
         
     }
 }

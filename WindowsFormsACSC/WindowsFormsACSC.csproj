@@ -64,6 +64,12 @@
     <Compile Include="FormCustomerOrderHistory.Designer.cs">
       <DependentUpon>FormCustomerOrderHistory.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormCustomerProduct.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCustomerProduct.Designer.cs">
+      <DependentUpon>FormCustomerProduct.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormMDI.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -104,6 +110,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormCustomerOrderHistory.resx">
       <DependentUpon>FormCustomerOrderHistory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormCustomerProduct.resx">
+      <DependentUpon>FormCustomerProduct.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormMDI.resx">
       <DependentUpon>FormMDI.cs</DependentUpon>

@@ -12,9 +12,9 @@ namespace ACSC.BL.Manager
     {
         public override IRepository<Customer> Repository => new CustomerRepository();
 
-        public List<Customer> GetBy(Customer obj)
+        public List<Customer> Search(Customer obj)
         {
-            return ((ICustomerRepository)Repository).GetBy(obj);
+            return ((ICustomerRepository)Repository).Search(obj);
         }
         public new int Save(Customer obj)
         {

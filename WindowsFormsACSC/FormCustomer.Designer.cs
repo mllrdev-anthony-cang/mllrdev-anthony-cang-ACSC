@@ -72,6 +72,7 @@
             this.listViewCustomer.UseCompatibleStateImageBehavior = false;
             this.listViewCustomer.View = System.Windows.Forms.View.Details;
             this.listViewCustomer.SelectedIndexChanged += new System.EventHandler(this.listViewCustomer_SelectedIndexChanged);
+            this.listViewCustomer.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listViewCustomer_MouseDoubleClick);
             // 
             // Id
             // 

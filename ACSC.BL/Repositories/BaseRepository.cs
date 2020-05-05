@@ -49,15 +49,15 @@ namespace ACSC.BL.Repositories
 
             try
             {
-                string[] excludedProperties = { "id", "isvalid", "fulladdress", "allinstring", "fullname", "minprice", "maxprice", "orderitems", "minorderdate", "maxorderdate",
-                    "customername", "customerphonenumber", "shippingaddress","orderitemproductname","orderitemproductdescription" };
-                var properties = obj.GetType().GetProperties().Where(e => excludedProperties.Contains(e.Name.ToLower()) == false);
-                var fields = string.Join(", ", properties.Select(e => e.Name));
-                var values = string.Join(", ", properties.Select(e => $"@{e.Name}"));
-                string sql = $"INSERT INTO {TableName} ({fields}) VALUES ({values});";
-                string[] tableWithNoIdentity = { "[orderitem]" };
+                //string[] excludedProperties = { "id", "isvalid", "fulladdress", "allinstring", "fullname", "minprice", "maxprice", "orderitems", "minorderdate", "maxorderdate",
+                    //"customername", "customerphonenumber", "shippingaddress","orderitemproductname","orderitemproductdescription" };
+                var properties = obj.GetType().GetProperties().Where(e => string.Equals(e.Name.ToLower(),"id") == false);
+                //var fields = string.Join(", ", properties.Select(e => e.Name));
+                //var values = string.Join(", ", properties.Select(e => $"@{e.Name}"));
+                string sql = $"INSERT INTO {TableName} ({string.Join(", ", properties.Select(e => e.Name))}) VALUES ({string.Join(", ", properties.Select(e => $"@{e.Name}"))});";
+                //string[] tableWithNoIdentity = { "[orderitem]" };
 
-                if(tableWithNoIdentity.Contains(TableName.ToLower()) == true)
+                if(string.Equals(TableName, "[orderitem]") == true)
                 {
                     return _connection.Execute(sql, obj);
                 }
@@ -79,7 +79,7 @@ namespace ACSC.BL.Repositories
         {
             try
             {
-                string[] exclude = { "id", "isvalid", "fulladdress", "allinstring", "customerid", "markas", "fullname", "minprice", "maxprice" };
+                string[] exclude = { "id", "markas" };
                 var properties = obj.GetType().GetProperties().Where(e => exclude.Contains(e.Name.ToLower()) == false);
                 var values = string.Join(", ", properties.Select(e => $"{e.Name} = @{e.Name}"));
                 string sql = $"UPDATE {TableName} SET {values} WHERE Id = @Id";

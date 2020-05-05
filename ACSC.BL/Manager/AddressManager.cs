@@ -12,9 +12,9 @@ namespace ACSC.BL.Manager
     {
         public override IRepository<Address> Repository => new AddressRepository();
 
-        public List<Address> GetBy(Address obj)
+        public List<Address> Search(Address obj)
         {
-            return ((IAddressRepository)Repository).GetBy(obj);            
+            return ((IAddressRepository)Repository).Search(obj);            
         }
 
         public new int Save(Address obj)

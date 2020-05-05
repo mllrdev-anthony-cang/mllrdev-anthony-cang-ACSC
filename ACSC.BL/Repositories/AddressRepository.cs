@@ -16,7 +16,7 @@ namespace ACSC.BL
     {
         internal override string TableName => "Address";
 
-        public List<Address> GetBy(Address address)
+        public List<Address> Search(Address address)
         {
             string generatedSQL = GenerateSQL(address);
             return base.Get(address, generatedSQL);

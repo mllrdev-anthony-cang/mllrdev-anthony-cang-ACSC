@@ -161,7 +161,7 @@ namespace WindowsFormsACSC
             //AddressRepository db = new AddressRepository();
             var db = _addressManager;
             var addressList = new List<ListViewItem>();
-            var addresses = db.GetBy(filter);
+            var addresses = db.Search(filter);
 
             foreach (var address in addresses)
             {
@@ -177,7 +177,7 @@ namespace WindowsFormsACSC
         }
         private void InitialTabProductState(Product product, IProductManager db)
         {
-            var customers = db.GetBy(product);
+            var customers = db.Search(product);
             FillListView(customers);
 
             labelProduct.Text = string.Empty;
@@ -217,7 +217,7 @@ namespace WindowsFormsACSC
         }
         private void InitialTabCustomerState(Customer customer, ICustomerManager db)
         {
-            var customers = db.GetBy(customer);
+            var customers = db.Search(customer);
             FillListView(customers);
 
             labelCustomer.Text = string.Empty;
@@ -233,7 +233,7 @@ namespace WindowsFormsACSC
         }
         private void InitialTabAddressState(Address address, IAddressManager db)
         {
-            var customers = db.GetBy(address);
+            var customers = db.Search(address);
             FillListView(customers);
 
             textBoxAddressHouse.Text = string.Empty;
@@ -267,13 +267,13 @@ namespace WindowsFormsACSC
         }
         private bool IsMatch(Product product, IProductManager db)
         {
-            if (string.IsNullOrWhiteSpace(product.AllInString) == true && product.MaxPrice == null && product.MinPrice == null)
+            /*if (string.IsNullOrWhiteSpace(product.AllInString) == true && product.MaxPrice == null && product.MinPrice == null)
             {
                 MessageBox.Show("Please enter a value before searching.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
-            }
+            }*/
 
-            var products = db.GetBy(product);
+            var products = db.Search(product);
 
             if (products.Count < 1)
             {
@@ -286,13 +286,13 @@ namespace WindowsFormsACSC
         }                
         private bool IsMatch(Customer customer, ICustomerManager db)
         {
-            if (string.IsNullOrWhiteSpace(customer.AllInString) == true)
+            /*if (string.IsNullOrWhiteSpace(customer.AllInString) == true)
             {
                 MessageBox.Show("Please enter a value before searching.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
-            }
+            }*/
 
-            var customers = db.GetBy(customer);
+            var customers = db.Search(customer);
 
             if (customers.Count < 1)
             {
@@ -311,7 +311,7 @@ namespace WindowsFormsACSC
                 return false;
             }
 
-            var addresses = db.GetBy(address);
+            var addresses = db.Search(address);
 
             if (addresses.Count < 1)
             {
@@ -368,8 +368,8 @@ namespace WindowsFormsACSC
                 numberOfitems += Convert.ToDecimal(orderitemsrows[i].SubItems[4].Text);
             }
             _totalAmount = total;
-            labelBillAndShip.Text = $"Customer: {_selectedCustomer.FullName}\r\n\r\nPhone Number:{_selectedCustomer.PhoneNumber}" +
-                $"\r\n\r\nAddress: {_selectedAddress.HouseBuildingStreet}, {_selectedAddress.Barangay}, {_selectedAddress.CityMunicipality}, {_selectedAddress.Province}";
+            //labelBillAndShip.Text = $"Customer: {_selectedCustomer.FullName}\r\n\r\nPhone Number:{_selectedCustomer.PhoneNumber}" +
+                //$"\r\n\r\nAddress: {_selectedAddress.HouseBuildingStreet}, {_selectedAddress.Barangay}, {_selectedAddress.CityMunicipality}, {_selectedAddress.Province}";
 
             labelOrderSummary.Text = $"Subtotal ({numberOfitems} items): {Math.Round(Convert.ToDouble(_totalAmount), 2).ToString("C")}" +
                 $"\r\n\r\nTotal: {Math.Round(Convert.ToDouble(_totalAmount), 2).ToString("C")}";
@@ -399,7 +399,8 @@ namespace WindowsFormsACSC
                 PurchasePrice = _selectedProduct.CurrentPrice
             };
 
-            if (orderitem.IsValid == false)
+            //if (orderitem.IsValid == false)
+            if(1==2)
             {
                 MessageBox.Show("Please enter a valid quantity.", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 textBoxProductQuantity.Focus();
@@ -479,15 +480,15 @@ namespace WindowsFormsACSC
             {
                 Name = textBoxProductName.Text.Trim(),
                 Description = textBoxProductDescription.Text.Trim(),
-                MaxPrice = decimal.TryParse(textBoxProductMaxPrice.Text.Trim(), out _maxPrice) ? _maxPrice : _maxPrice,
-                MinPrice = decimal.TryParse(textBoxProductMinPrice.Text.Trim(), out _minPrice) ? _minPrice : _minPrice
+                //MaxPrice = decimal.TryParse(textBoxProductMaxPrice.Text.Trim(), out _maxPrice) ? _maxPrice : _maxPrice,
+                //MinPrice = decimal.TryParse(textBoxProductMinPrice.Text.Trim(), out _minPrice) ? _minPrice : _minPrice
             };
 
-            if (product.MaxPrice == 0 && product.MinPrice == 0)
+            /*if (product.MaxPrice == 0 && product.MinPrice == 0)
             {
                 product.MaxPrice = null;
                 product.MinPrice = null;
-            }
+            }*/
 
             if (IsMatch(product, _productManager) == true)
             {
@@ -495,8 +496,8 @@ namespace WindowsFormsACSC
                 buttonProductReset.Enabled = true;
                 textBoxProductName.Text = product.Name;
                 textBoxProductDescription.Text = product.Description;
-                textBoxProductMaxPrice.Text = product.MaxPrice.ToString();
-                textBoxProductMinPrice.Text = product.MinPrice.ToString();
+                //textBoxProductMaxPrice.Text = product.MaxPrice.ToString();
+                //textBoxProductMinPrice.Text = product.MinPrice.ToString();
             }
         }               
         private void buttonProductCancel_Click(object sender, EventArgs e)
@@ -626,7 +627,7 @@ namespace WindowsFormsACSC
                 _selectedCustomer.LastName = selectedrow[0].SubItems[2].Text;
                 _selectedCustomer.PhoneNumber = selectedrow[0].SubItems[3].Text;
             }
-            labelCustomer.Text = $"Name: {_selectedCustomer.FullName}\r\n\r\nPhone number:{_selectedCustomer.PhoneNumber}";
+            //labelCustomer.Text = $"Name: {_selectedCustomer.FullName}\r\n\r\nPhone number:{_selectedCustomer.PhoneNumber}";
             //textBoxCustomerFirstName.Text = _selectedCustomer.FirstName;
             //textBoxCustomerLastName.Text = _selectedCustomer.LastName;
             //textBoxCustomerPhoneNumber.Text = _selectedCustomer.PhoneNumber;
@@ -714,8 +715,8 @@ namespace WindowsFormsACSC
                 AddressId = _selectedAddress.Id,
                 OrderDate = orderDate,
                 TotalAmount = _totalAmount,
-                MinOrderDate = orderDate.ToString("yyyy-MM-dd HH:mm:ss.fff"),
-                MaxOrderDate = orderDate.ToString("yyyy-MM-dd HH:mm:ss.fff")
+                //MinOrderDate = orderDate.ToString("yyyy-MM-dd HH:mm:ss.fff"),
+                //MaxOrderDate = orderDate.ToString("yyyy-MM-dd HH:mm:ss.fff")
             };
             //IOrderRepository<Order> orderDB = new OrderRepository();
             IOrderManager orderDB = new OrderManager();
@@ -752,7 +753,7 @@ namespace WindowsFormsACSC
                 }
             }
 
-            order.OrderItems = orderitemlist;
+            //order.OrderItems = orderitemlist;
 
             MessageBox.Show($"Your order of {orderSummaryRows.Count} of {saveCount} items is placed. ", "Message Box", MessageBoxButtons.OK, MessageBoxIcon.Information);
             _orderSaved = true;

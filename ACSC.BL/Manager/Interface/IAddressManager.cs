@@ -8,6 +8,6 @@ namespace ACSC.BL.Manager.Interface
 {
     public interface IAddressManager : IManager<Address>
     {
-        List<Address> GetBy(Address obj);
+        List<Address> Search(Address obj);
     }
 }

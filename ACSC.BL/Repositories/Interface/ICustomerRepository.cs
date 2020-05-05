@@ -8,6 +8,6 @@ namespace ACSC.BL.Repositories.Interface
 {
     public interface ICustomerRepository: IRepository<Customer>
     {
-        List<Customer> GetBy(Customer obj);
+        List<Customer> Search(Customer obj);
     }
 }

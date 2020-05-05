@@ -8,8 +8,8 @@ using ACSC.BL.Repositories.Interface;
 
 namespace ACSC.BL.Manager.Interface
 {
-    public interface ICustomerOrderHistoryRepository : IRepository<CustomerOrderHistory>
+    public interface ICustomerOrderHistoryRepository : IRepository<CustomerProductOrderHistory>
     {
-        List<CustomerOrderHistory> GetBy(CustomerOrderHistory obj);
+        List<CustomerProductOrderHistory> Search(CustomerProductOrderHistory obj);
     }
 }
